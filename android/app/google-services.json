@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "184714010111",
+    "project_id": "tahfeez-cb901",
+    "storage_bucket": "tahfeez-cb901.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:184714010111:android:c36e88dff610c1cb4bdbca",
+        "android_client_info": {
+          "package_name": "com.example.tahfeez_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCcQs70gMGDwLIKBV65RrdrFaB6tVLocec"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
