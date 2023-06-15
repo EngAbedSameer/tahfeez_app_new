@@ -9,9 +9,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'package:tahfeez_app/moodle/HalaqaModel.dart';
+import 'package:tahfeez_app/moodle/student.dart';
 import 'sqfDB.dart';
 import 'package:intl/intl.dart' as intl;
-
 
 class AddStudent extends StatefulWidget {
   final memorizerEmail;
@@ -32,8 +32,7 @@ class _AddStudentState extends State<AddStudent>
   }
 
   Firestore myFierstor = Firestore();
-
-
+  late Student std;
 
   final _formKey = GlobalKey<FormState>();
 
@@ -65,33 +64,49 @@ class _AddStudentState extends State<AddStudent>
       lastTestDegree) async {
     try {
       DateTime now = DateTime.now();
-      String date= intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-       print('date : $date  ///////////////');
+      String date = intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+      std = new Student(
+          fname: fname,
+          mname: mname,
+          lname: lname,
+          idn: idn,
+          dob: dob,
+          phone: phone,
+          school: school,
+          level: level,
+          score: "0",
+          attendance: "0",
+          commitment: "0",
+          points: "0",
+          lastTest: lastTest,
+          lastTestDegree: lastTestDegree,
+          last_update: date);
+      std.addStudent();
       // String date =
       //     '${now.year}-${now.month}-${now.day} ${now.hour}:${now.minute}:${now.second}';
-      await db.insertData(
-          "INSERT INTO 'Students' (f_name, m_name ,l_name, IDn, DOB ,phone, school, level, score, attendance, commitment, points, lastTest ,lastTestDegree ,last_update) VALUES ('$fname', '$mname', '$lname' , '$idn' ,'$dob','$phone', '$school', '$level', '0','0','0','0','$lastTest' , '$lastTestDegree' , '$date')");
-
-      myFierstor.addStudent(data: {
-        "phone": phone.toString(),
-        "f-name": fname.toString(),
-        "m-name": mname.toString(),
-        "l-name": lname.toString(),
-        "DOB": dob.toString(),
-        "IDn": idn.toString(),
-        "school": school.toString(),
-        "level": level.toString(),
-        "Last-test": lastTest.toString(),
-        "Last-test-degree": lastTestDegree.toString(),
-        "last-update": date.toString()
-      }, mEmail: widget.memorizerEmail.toString());
+      // await db.insertData(
+      //     "INSERT INTO 'Students' (f_name, m_name ,l_name, IDn, DOB ,phone, school, level, score, attendance, commitment, points, lastTest ,lastTestDegree ,last_update) VALUES ('$fname', '$mname', '$lname' , '$idn' ,'$dob','$phone', '$school', '$level', '0','0','0','0','$lastTest' , '$lastTestDegree' , '$date')");
+      // myFierstor.addStudent(data: {
+      //   "phone": phone.toString(),
+      //   "f-name": fname.toString(),
+      //   "m-name": mname.toString(),
+      //   "l-name": lname.toString(),
+      //   "DOB": dob.toString(),
+      //   "IDn": idn.toString(),
+      //   "school": school.toString(),
+      //   "level": level.toString(),
+      //   "Last-test": lastTest.toString(),
+      //   "Last-test-degree": lastTestDegree.toString(),
+      //   "last-update": date.toString()
+      // }, mEmail: widget.memorizerEmail.toString());
     } catch (e) {
       print(e);
     }
   }
 
-  Future<List<Map>> _getStudentHistory() async {
-    List<Map> result = await db.readData("SELECT * FROM Records WHERE std_id=");
+  Future<List<Map>> _getStudentHistory(id) async {
+    List<Map> result =
+        await db.readData("SELECT * FROM Records WHERE std_id='id' ");
     // print(result[0]["date"].split(" ")[0]);
     // print(" ******************** ");
     // print(DateTime.now().toString().split(" ")[0]);

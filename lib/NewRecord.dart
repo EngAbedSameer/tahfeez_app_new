@@ -2,15 +2,16 @@
 // ignore_for_file: avoid_print, implementation_imports, prefer_typing_uninitialized_variables, sort_child_properties_last, file_names
 
 import 'dart:math';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
 import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
+import 'package:tahfeez_app/moodle/Record.dart';
 import 'sqfDB.dart';
 import 'package:intl/intl.dart' as intl;
 
@@ -20,7 +21,10 @@ class NewRecord extends StatefulWidget {
   final studentPhone;
 
   const NewRecord(
-      {super.key, required this.stdID, required this.memorizerEmail, this.studentPhone});
+      {super.key,
+      required this.stdID,
+      required this.memorizerEmail,
+      this.studentPhone});
 
   @override
   State<NewRecord> createState() => _NewRecordState();
@@ -44,82 +48,46 @@ class _NewRecordState extends State<NewRecord>
 
   double factor = 1;
   String getRandomID(int length) {
-  final random = Random();
-  const availableChars =
-      'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
-  final randomString = List.generate(length,
-      (index) => availableChars[random.nextInt(availableChars.length)]).join();
+    final random = Random();
+    const availableChars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    final randomString = List.generate(length,
+            (index) => availableChars[random.nextInt(availableChars.length)])
+        .join();
 
-  return randomString;
-}
-
-  _save(
-      {surah,
-      frm,
-      t,
-      double? quality,
-      double? pgsCount,
-      commitment,
-      type}) async {
-    String name = await _getStdName().then(
-          (value) => value,
-        ) +
-        "";
-String randomID=getRandomID(10);
-    DateTime now = DateTime.now();
-       String date= intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-       print('date : $date  ///////////////');
-    // String date =
-    //     '${now.year}-${now.month}-${now.day} ${now.hour}:${now.minute}:${now.second}';
-    var _score = pgsCount! * quality!;
-    var _points = (_score * factor);
-    var oldData = await db.readData(
-        " Select attendance, points,commitment from Students WHERE IDn=${widget.stdID}");
-    var points = oldData[0]['points'];
-    var _commitment = oldData[0]['commitment'];
-    await db.updateData(
-        "UPDATE 'Students'  SET score= $_score ,commitment= ${commitment + _commitment}, points=${_points + points} , attendance='${oldData[0]['attendance'] + 1}' , last_update='$date' WHERE IDn=${widget.stdID}");
-    await db.insertData(
-        "INSERT INTO 'Records' (id, std_id, surah, date, frm, t, quality, pgs_count, commitment, type,isSynced) VALUES ( '$randomID' ,${widget.stdID} , '$surah' , '$date' , $frm , $t , ${quality!} , ${pgsCount!} , $commitment , '${type.toString()}', 'false')");
-    await db.insertData(
-        "INSERT INTO 'Attendance' (std_id, name, date) VALUES ( '${widget.stdID}' , '$name' ,'$date' )");
-try{
-   String cloudRecordID=await myFierstor.addRecord(
-        idn: widget.stdID.toString(),
-        mEmail: widget.memorizerEmail,
-        data: {
-          'date': date,
-          'surah': surah,
-          'from': frm,
-          'to': t,
-          'quality': quality,
-          'pgsCount': pgsCount,
-          'commitment': commitment, 
-          'type': type,
-          'isSynced':'false'
-        });
-        myFierstor.setStudentLastUpdate(mEmail: widget.memorizerEmail,idn:widget.stdID.toString() );
-        // myFierstor.setStudentLastUpdate();
-        db.updateData("UPDATE 'Records' SET id = '$cloudRecordID'  WHERE std_id=${widget.stdID} ");
-        }on FirebaseException catch(e){
-          if(e.code=="network-request-failed"){
-             ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("هذا البريد الإالكتروني مسجل لمستخدم آخر")));
-          }
-        }
+    return randomString;
   }
 
-  // addRecord({stdID,email,surah,from,to,quality,pgsCount,commitment,type,}) {
-  //   myFierstor.addStudentRecord(stdID.toString(), email, {
-  //     'surah': surah,
-  //     'from': from,
-  //     'to': to,
-  //     'quality': quality,
-  //     'pgsCount': pgsCount,
-  //     'commitment': commitment,
-  //     'type': type
-  //   });
-  // }
+  save(String stdID, String email, String surah, String from, String to,
+      double quality, double pgsCount, double commitment, double type) async {
+    try {
+      // add record to local database
+      String localRecordID = await db.addRecord(
+          stdID, surah, from, to, quality, pgsCount, commitment, type);
+      // add record to cloud database
+      String cloudRecordID = await myFierstor
+          .addRecord(idn: stdID.toString(), mEmail: email, data: {
+        'surah': surah,
+        'from': from,
+        'to': to,
+        'quality': quality,
+        'pgsCount': pgsCount,
+        'commitment': commitment,
+        'type': type,
+        'isSynced': 'false'
+      });
+      // update record id field in local database
+      await db.updateRecordID(localRecordID, cloudRecordID);
+      // update lastUpdate field in student cloud doc.
+      myFierstor.setStudentLastUpdate(mEmail: email, idn: stdID.toString());
+    } catch (e) {
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.error,
+          text: e.toString(),
+          title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+    }
+  }
 
   Future<String> _getStdName() async {
     List<Map> stdData = await db.readData(
@@ -337,7 +305,7 @@ try{
                                   Container(child: dropdownButton()),
                                   Container(
                                       width: _screenWidth * 0.5,
-                                      child: SearchField (
+                                      child: SearchField(
                                         textInputAction: TextInputAction.next,
                                         autoCorrect: true,
                                         hint: 'اختر اسم السورة',
@@ -360,7 +328,10 @@ try{
                                         suggestions: souras,
                                         validator: (value) {
                                           print(value);
-                                          if (this.selectedSurahValue==null || this.selectedSurahValue!.isEmpty) {
+                                          if (this.selectedSurahValue == null ||
+                                              this
+                                                  .selectedSurahValue!
+                                                  .isEmpty) {
                                             return 'يجب الاختيار من القائمة';
                                           }
                                           return null;
@@ -497,20 +468,27 @@ try{
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
                             // print("${_surahController.text}     ${this.selectedSurahValue}");
-                            _save(
-                                surah:this.selectedSurahValue,
-                                frm: _frmController.text,
-                                t: _tController.text,
-                                quality: double.parse(_qualityController.text),
-                                pgsCount:
-                                    double.parse(_pgsCountController.text),
-                                commitment:
-                                    double.parse(_commitmentController.text),
-                                type: (factor == 0.5) ? "مراجعة" : "حفظ");
-
-                            Navigator.of(context)
-                                .popUntil((route) => route.isFirst);
-
+                            save(
+                                widget.stdID.toString(),
+                                widget.memorizerEmail,
+                                this.selectedSurahValue.toString(),
+                                _frmController.text,
+                                _tController.text,
+                                double.parse(_qualityController.text),
+                                double.parse(_pgsCountController.text),
+                                double.parse(_commitmentController.text),
+                                factor);
+                            try {
+                              Navigator.of(context)
+                                  .popUntil((route) => route.isFirst);
+                            } on FirebaseException catch (e) {
+                              QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  text: e.toString(),
+                                  title:
+                                      "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+                            }
 // myFierstor.addStudent(
 //                                 widget.studentPhone.toString(),
 //                                 widget.memorizerEmail, {

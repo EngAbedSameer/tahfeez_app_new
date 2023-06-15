@@ -1,7 +1,10 @@
 // ignore_for_file: avoid_print, avoid_function_literals_in_foreach_calls
 
+import 'dart:math';
+
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart' as p;
+import 'package:intl/intl.dart' as intl;
 
 class SqlDb {
   static Database? _db;
@@ -41,9 +44,7 @@ class SqlDb {
     "phone" TEXT NOT NULL,
     "school" TEXT NOT NULL,
     "level" INTEGER NOT NULL,
-    "score" INTEGER NOT NULL,
     "attendance" INTEGER NOT NULL,
-    "commitment" INTEGER NOT NULL,
     "points" INTEGER NOT NULL,
     "lastTest" TEXT NOT NULL ,
     "lastTestDegree" DOUBLE NOT NULL,
@@ -140,5 +141,47 @@ class SqlDb {
     updateData("UPDATE Students Set last_update='$now'");
 
     //  });
+  }
+
+  String getRandomID(int length) {
+    final random = Random();
+    const availableChars =
+        'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
+    final randomString = List.generate(length,
+            (index) => availableChars[random.nextInt(availableChars.length)])
+        .join();
+    return randomString;
+  }
+
+  Future<String> addRecord(
+    String stdID,
+    String surah,
+    String from,
+    String to,
+    double quality,
+    double pgsCount,
+    double commitment,
+    double type,
+  ) async {
+    String randomID = getRandomID(20);
+    DateTime now = DateTime.now();
+    String date = intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+    var _score = pgsCount * quality;
+    var newPoints = (_score * type);
+    var oldData =
+        await readData(" Select points from Students WHERE IDn=${stdID}");
+    var oldPoints = oldData[0]['points'];
+    await updateData(
+        "UPDATE 'Students' SET points=${newPoints + oldPoints}, last_update='$date' WHERE IDn=${stdID}");
+    await insertData(
+        "INSERT INTO 'Records' (id, std_id, surah, date, frm, t, quality, pgs_count, commitment, type,isSynced) VALUES ( '$randomID' ,${stdID} , '$surah' , '$date' , $from , $to , ${quality!} , ${pgsCount!} , $commitment , '${(type == 1) ? "حفظ" : "مراجعة"}', 'false')");
+    return randomID;
+  }
+
+  updateRecordID(oldID,newID) async {
+  await readData("UPDATE 'Records' SET id=$newID where id=$oldID").onError((error, stackTrace) {
+    // print(error);
+    return [{"e":error}];
+  } );
   }
 }

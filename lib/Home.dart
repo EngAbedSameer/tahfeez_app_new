@@ -16,6 +16,7 @@ import 'package:tahfeez_app/StudenProfile.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/MenuItem.dart';
 import 'package:tahfeez_app/moodle/MenuItems.dart';
+import 'package:tahfeez_app/moodle/student.dart';
 import 'package:tahfeez_app/services/MapStyle.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'sqfDB.dart';
@@ -37,16 +38,13 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Firestore myFierstor = Firestore();
   Duration? executionTime;
   Future<dynamic> _exportAllStudetDate() async {
-    List<Map> result = await db.readData("SELECT * FROM students");
+    List<Map> result = await _getStudentsDate();
     return result;
     // exportToExcel(result, "AllStdData.xlsx");
   }
 
   Future<dynamic> _exportAllRecordsDate() async {
     List<Map> result = await db.readData("SELECT * FROM Records");
-    // print(" ============ ON Export Reocreds ===========");
-    // print(result);
-
     return result;
     // exportToExcel(result, "AllStdRecords.xlsx");
   }
