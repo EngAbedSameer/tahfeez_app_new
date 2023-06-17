@@ -1,23 +1,25 @@
 // import 'dart:js_interop';
+import 'dart:js_util';
 import 'dart:math';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:tahfeez_app/services/MapStyle.dart';
+import 'package:tahfeez_app/sqfDB.dart';
 
 class Firestore {
-  final _db = FirebaseFirestore.instance;
+  final ref = FirebaseFirestore.instance;
   // SqlDb db = SqlDb();
+  SqlDb db = SqlDb();
 
   Future<CollectionReference> getHalaqatCollection() async {
-    _db.settings = const Settings(
-  persistenceEnabled: true,
-  cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-);
+    ref.settings = const Settings(
+      persistenceEnabled: true,
+      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+    );
 
-
-    var halaqatColl = await _db.collection("Halaqat");
+    var halaqatColl = await ref.collection("Halaqat");
     var temp = await halaqatColl.get();
     return halaqatColl;
   }
@@ -41,8 +43,8 @@ class Firestore {
       {required String? mEmail}) async {
     var halaqa = await getHalaqaDoc(mEmail: mEmail);
     var temp = await halaqa.collection("Students");
-    var temp2 = await temp.get();
-    return temp;
+    var temp2 = await temp.where("isDeleted", isEqualTo: "false").get();
+    return temp2;
   }
 
   Future<DocumentReference> getStudentDoc(
@@ -74,7 +76,6 @@ class Firestore {
     // var recordDoc = redords.doc(temp.docs.first.id);
     return r.docs;
   }
-
 
   getHalaqaData({String? mEmail}) async {
     DocumentReference halaqaDoc = await getHalaqaDoc(mEmail: mEmail!);
@@ -116,12 +117,14 @@ class Firestore {
   }
 
   setStudentData(
-      {required String? mEmail,required String? idn, required Map<Object, Object>? data}) async {
+      {required String? mEmail,
+      required String? idn,
+      required Map<Object, Object>? data}) async {
     print(idn);
     MapStyle().printMap(data!);
     var student = await getStudentDoc(mEmail: mEmail, idn: idn);
     student.update(data!);
-  } 
+  }
 
   doseStdHasRecords(mEmail, idn) {
     try {
@@ -132,7 +135,6 @@ class Firestore {
       return false;
     }
   }
-
 
   addMemorizer(Map<String, dynamic> data) async {
     var halaqat = await getHalaqatCollection();
@@ -158,7 +160,7 @@ class Firestore {
     final records = await getRecordsCollection(idn: idn, mEmail: mEmail);
     DateTime now = DateTime.now();
     String date = intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-    data?.addEntries({"date":date}.entries);
+    data?.addEntries({"date": date}.entries);
     Future<String> result = records.add(data).then<String>((documentSnapshot) {
       print("Added Records with ID: ${documentSnapshot.id}");
       return documentSnapshot.id.toString();
@@ -167,267 +169,376 @@ class Firestore {
     return result;
   }
 
-  
+  deleteStudent(mEmail, stdIDn) async {
+    final students = await getStudentsCollection(mEmail: mEmail);
+    var s = await students.where("IDn", isEqualTo: stdIDn!).get();
+    print(s.docs.first.id);
 
+    students.doc(s.docs.first.id.toString()).delete().then(
+          (doc) => print("Document deleted"),
+          onError: (e) => print("Error updating document $e"),
+        );
+  }
 
+/**
+ * 
+ * **
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ * *
+ */
 
-  
+  syncItem(Map cloudData, Map localData, mEmail) {
+    var cloudDate = _reformateDate(cloudData['last_update'].toString());
+    var localDate = _reformateDate(cloudData['last_update'].toString());
+    if (cloudDate.compareTo(localDate) >= 1) {
+      // local data is old
+      updateLocalDatabase(cloudData);
+      // syncRecords();
+    } else if (cloudDate.compareTo(localDate) <= -1) {
+      // firestore data is old
+      updateCloud();
+    }
+  }
 
-  // Future<Query<Map>> _snapshot(String memorizerEmail) async {
-  //   final snapshot = await _db
-  //       .collection("Halaqat")
-  //       .where("m-email", isEqualTo: memorizerEmail);
-  //   return snapshot;
-  // }
+  updateCloud() {
+    // syncRecords();
+    setStudentData(
+        mEmail: mEmail,
+        data: localData as Map<Object, Object>,
+        idn: cloudData['IDn'].toString());
+  }
 
-  // // Future<HalaqaModel> getUserData(String email) async {
-  // //   final snapshot =
-  // //       await _db.collection("users").where("email", isEqualTo: email).get();
-  // //   final userData =
-  // //       snapshot.docs.map((e) => HalaqaModel.fromSnapshot(e)).single;
-  // //   return userData;
-  // // }
+  DateTime _reformateDate(String date) {
+    DateTime newDate = intl.DateFormat('yyyy-MM-dd HH:mm:ss').parse(date);
+    return newDate;
+  }
 
-  // Future<String> getHalaqaID(String memorizerEmail) async {
-  //   final snapshot = await _snapshot(memorizerEmail);
-  //   final docs = await snapshot.get();
-  //   final halaqaID = docs.docs.single.id.toString();
-  //   // print(halaqaID);
-  //   return halaqaID;
-  // }
+  syncData(mEmail) async {
+    try {
+      CollectionReference _firestoreData =
+          await getStudentsCollection(mEmail: mEmail);
+      QuerySnapshot cloudStudents = await _firestoreData.get();
+      List<Map<String, dynamic>> localStudents = await db
+          .readData("select * from Students") as List<Map<String, dynamic>>;
 
-  // getStudentCollection({String? stdID, String? memorizerEmail}) async {
-  //   final snapshot = await _snapshot(memorizerEmail!);
-  //   String halaqaID = await getHalaqaID(memorizerEmail);
-  //   // var a=await snapshot.firestore.doc("/Halaqat/pU5Y7bSCLZE1qDXJTBRE").collection("/Students").get();
+      // var cloudDate, localDate;
+      Map<Object, Object> localStudent = {};
+      // var cloudStudent;
 
-  //   print(stdID);
-  //   print(" ///////////// ");
-  //   var halaqa = await snapshot.firestore.doc("/Halaqat/" + halaqaID);
-  //   // var gets=await halaqa.collection("/Students")
-  //   // .where("IDn", isEqualTo: stdID)
-  //   // .get();
-  //   var temp = await halaqa
-  //       .collection("/Students")
-  //       .where("IDn", isEqualTo: int.parse(stdID!))
-  //       .get();
-  //   var _temp = await halaqa
-  //       .collection("/Students")
-  //       .where("IDn", isEqualTo: int.parse(stdID));
-  //   var tt = await _temp.firestore.collection("Records").add({'sad': 'dsa'});
+      // syncStudentData(cloudDate, localDate, cloudStudents, localStudent, mEmail);
 
-  //   print(await temp.docs.first.data());
-  //   print(await _temp.get());
-  //   print(await tt.path);
-  //   var studentID = temp.docs.single.id;
-  //   print(studentID);
-  //   return studentID;
-  // }
+      // if (cloudStudents.docs.length == localStudents.length) {
+      //   for (int i = 0; i < cloudStudents.docs.length; i++) {
+      //     cloudStudent = cloudStudents.docs[i].data() as Map;
+      //     // Map temp = await localStudents
+      //     //     .where((element) =>
+      //     //         element['IDn'].toString() == cloudStudent['IDn'].toString())
+      //     //     .single;
+      //     List<Map> _temp = await db.readData(
+      //         'select * from Students where IDn=${cloudStudent['IDn']}');
+      //     Map temp = _temp.single;
+      //     temp.forEach((key, value) {
+      //       Object _key = key as Object;
+      //       Object _value = value as Object;
+      //       localStudent.addEntries({_key: _value}.entries);
+      //     });
+      //     cloudDate = _reformateDate(cloudStudent['last_update'].toString());
+      //     localDate = _reformateDate(localStudent['last_update'].toString());
+      //     if ((localStudent != null && cloudStudent != null) &&
+      //         (!localStudent.isEmpty && !cloudStudent.isEmpty)) {
+      //       syncStudentData(
+      //           cloudDate, localDate, cloudStudent, localStudent, mEmail);
+      //       // if (cloudDate.compareTo(localDate) >= 1) {
+      //       //   // local data is old
+      //       //   updateLocalDatabase(cloudStudent);
+      //       // } else if (cloudDate.compareTo(localDate) <= -1) {
+      //       //   // firestore data is old
+      //       //    setStudentData(
+      //       //       email: memorizerEmail,
+      //       //       data: localStudent,
+      //       //       id: localStudent['IDn'].toString());
+      //       // } else if (cloudDate.compareTo(localDate) == 0) {
+      //       // }
+      //     } else if ((!cloudStudent.isEmpty && localStudent.isEmpty) ||
+      //         (cloudStudent != null && localStudent == null)) {
+      //       // updateLocalDatabase(cloudStudent);
+      //     } else if ((cloudStudent.isEmpty && !localStudent.isEmpty) ||
+      //         (cloudStudent == null && localStudent != null)) {
+      //       //  setStudentData(
+      //       //     email: memorizerEmail,
+      //       //     data: localStudent as Map<Object, Object>,
+      //       //     id: localStudent['IDn'].toString());
+      //     }
+      //     // } catch (e) {
+      //     //
+      //     //   // QuickAlert.show(
+      //     //   //     context: context,
+      //     //   //     type: QuickAlertType.error,
+      //     //   //     text: e.toString(),
+      //     //   //     title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+      //     // }
+      //   }
+      // } else
+      if (cloudStudents.docs.length <= localStudents.length) {
+        List<Map> newstudents = List.from(localStudents);
+        if (cloudStudents.docs.length != 0) {
+          for (int i = 0; i < localStudents.length; i++) {
+            for (int j = 0; j < cloudStudents.docs.length; j++) {
+              if (localStudents[i]['IDn'].toString() ==
+                  cloudStudents.docs[j]['IDn'].toString()) {
+                syncItem(cloudStudents.docs[j].data(), localStudent[i]);
+                setStudentLastUpdate(
+                    mEmail: mEmail,
+                    idn: cloudStudents.docs[j]['IDn'].toString());
+                if (j >= cloudStudents.docs.length &&
+                    (cloudStudents.docs[j]['isDeleted'].toString() == 'false' ||
+                        cloudStudents.docs[j]['isDeleted'].toString() ==
+                            null)) {
+                  addStudent(mEmail: mEmail, data: localStudents[i]);
+                } else {
+                  deleteStudent(mEmail, cloudStudents.docs[j]['IDn']);
+                }
+                break;
+              }
+            }
+          }
+        }
+        newstudents.forEach((std) async {
+          await addStudent(data: std as Map<String, dynamic>, mEmail: mEmail);
+        });
+      } else if (cloudStudents.docs.length > localStudents.length) {
+        List newstudents = List.from(cloudStudents.docs.toList());
+        if (cloudStudents.docs.length != 0) {
+          for (int i = 0; i < cloudStudents.docs.length; i++) {
+            for (int j = 0; j < localStudents.length; j++) {
+              if (localStudents[j]['IDn'].toString() ==
+                  cloudStudents.docs[i]['IDn'].toString()) {
+                newstudents.removeWhere((element) =>
+                    element['IDn'] == cloudStudents.docs[i]['IDn']);
+                break;
+              }
+            }
+          }
+        }
+        for (int s = 0; s < newstudents.length; s++) {
+          var std = newstudents[s];
+          int response = await db.insertData(
+              "INSERT INTO 'Students' (f_name, m_name ,l_name, IDn, DOB ,phone, school, level, score, attendance, commitment, points, lastTest ,lastTestDegree ,last_update) VALUES ('${std['f_name']}', '${std['m_name']}', '${std['l_name']}' , '${std['IDn']}' ,'${std['DOB']}','${std['phone']}', '${std['school']}', '${std['level']}', '${std['score']}','${std['attendance']}','${std['commitment']}','${std['points']}','${std['lastTest']}' , '${std['lastTestDegree']}' , '${std['last_update']}')");
+          if (response == 0) break;
+        }
+      }
+      // List<Map<String, dynamic>> localData = await db.readData(
+      //     "SELECT score ,attendance ,commitment ,points FROM Students");
+      /*
+      score attendance commitment points previous_points last_update
+          */
+      // if ((localStudents != null && students.docs != null) &&
+      //     (!localStudents.isEmpty && !students.docs.isEmpty)) {
+      //   for (int i = 0; i < students.docs.length; i++) {
+      //     var fd = _reformateDate(students.docs[i].data()
+      //         .elementAt(i)['last_update']
+      //         .toString()
+      //         .split("T")[0]); //"2012-02-27 13:27:00"
+      //     var ld = _reformateDate(
+      //         localStudents[i]['last_update'].toString().split("T")[0]);
+      //     if (fd.compareTo(ld) == 1) {
+      //       // local data is old
+      //       updateLocalDatabase(
+      //           students.docs.values.elementAt(i)['id'].toString(),
+      //           students.docs.values.elementAt(i));
+      //     } else if (ld.compareTo(fd) == 1) {
+      //       // firestore data is old
+      //       fb.updateDocument(localStudents[i]['id'].toString(), localStudents[i]);
+      //     } else if (ld.compareTo(fd) == 0) {
+      //     }
+      //   }
+      // }
+      //  else if (localData == null || localData.isEmpty) {
+      //   Map<dynamic, Map> firestoreRecordData =
+      //       await getFirestoreDataAsListWithID('record');
+      //   Map<dynamic, Map> firestoreAtteData =
+      //       await getFirestoreDataAsListWithID('attendance');
+      //   // _updateLocalDataBasedOnFirebase(
+      //   //     firestoreData.values.toList(),
+      //   //     firestoreRecordData.values.toList(),
+      //   //     firestoreAtteData.values.toList());
+      // }
+      // else if (localData.length > firestoreData.length) {
+      //   _uploadeDataToFirestore(localData); // update local data
+      // }
+      return true;
+    } on Exception catch (e) {
+      // Navigator.pop(context);
+      // QuickAlert.show(
+      //     context: context,
+      //     type: QuickAlertType.error,
+      //     text: e.toString(),
+      //     title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+      return false;
+    }
+  }
 
-  // // Future<List> getStudentByPhone(String stdPhone, String memorizerEmail) async {
-  // //   final snapshot = await _snapshot(memorizerEmail);
-  // //   String halaqaID = await getHalaqaID(memorizerEmail);
-  // //   String studentID = await getStudentCollection(stdPhone, memorizerEmail);
-  // //   var gets = await snapshot.firestore
-  // //       .doc("/Halaqat/" + halaqaID)
-  // //       .collection("/Students")
-  // //       .where("phone", isEqualTo: stdPhone)
-  // //       .get();
-  // //   var students = gets.docs;
-  // //   // print(students.first.data());
-  // //   return students;
-  // // }
+  updateLocalDatabase(Map data) async {
+    String school = data['school'].toString();
+    await db.updateData(
+        "UPDATE 'Students' SET school='$school', score= ${data['score']} , attendance=${data['attendance']} ,commitment= ${data['commitment']} , points=${data['points']}, lastTest=${data['lastTest']},lastTestDegree=${data['lastTestDegree']}, phone=${data['phone']} WHERE IDn=${data['IDn']}"); //last_update='${data['last_update']}',
+  }
 
-  // addCollection({Map<String, dynamic>? data, String? collectionName}) async {
-  //   CollectionReference halaqat = _db.collection("Halaqat");
-  //   var result = await halaqat.add({"m-email": data!['m-email']});
-  //   print(result.id);
-  //   await addMutiCollection(
-  //       halaqaID: result.id, data: data, collectionName: collectionName!);
-  // }
+  syncStudentData(DateTime cloudDate, DateTime localDate, cloudStudent,
+      Map<Object, Object> localStudent, mEmail) {
+    if (cloudDate.compareTo(localDate) >= 1) {
+      // local data is old
+      updateLocalDatabase(cloudStudent);
+      // syncRecords();
+    } else if (cloudDate.compareTo(localDate) <= -1) {
+      // firestore data is old
+      // syncRecords();
 
-  // Future<String?> addMutiCollection(
-  //     {String? halaqaID,
-  //     Map<String, dynamic>? data,
-  //     String? collectionName}) async {
-  //   CollectionReference halaqat = _db.collection("Halaqat");
-  //   // data!.addEntries({"":""}.entries);
-  //   var result =
-  //       await halaqat.doc(halaqaID).collection(collectionName!).add(data!);
-  //   // print(result.id);
-  //   // print(await halaqat.doc(id).collection(collectionName!).doc(result.id).firestore.doc(result.id));
-  //   // var result=halaqat.doc(id).collection(collectionName!).add(data!);
-  //   return "done";
-  // }
+      setStudentData(
+          mEmail: mEmail,
+          data: localStudent,
+          idn: cloudStudent['IDn'].toString());
+    }
+  }
 
-  // Future<String?> addMutiCollectionUsingEmail(
-  //     {String? email,
-  //     Map<String, dynamic>? data,
-  //     String? collectionName}) async {
-  //   print(email);
-  //   CollectionReference halaqat = await _db.collection("Halaqat");
-  //   // data!.addEntries({"":""}.entries);
-  //   var result = await halaqat.where("m-email", isEqualTo: email);
-  //   var x = await result.get();
-  //   var id = await x.docs.first.id;
-  //   addMutiCollection(halaqaID: id, collectionName: collectionName, data: data);
-  //   // result.firestore.collection(collectionName!).add(data!);
-  //   // return "done";
-  // }
-
-  // Future<String?> addMutiCollectionUsingStdID(
-  //     {String? id, Map<String, dynamic>? data, String? collectionName}) async {
-  //   CollectionReference students = await _db.collection("Students");
-  //   // data!.addEntries({"":""}.entries);
-  //   print(students.path);
-  //   var result = await students.where("IDn", isEqualTo: int.parse(id!));
-  //   print(" ------------- ");
-  //   print(result.firestore);
-  //   var x = await result.get();
-  //   var ids = await x.docs.first.id;
-  //   addMutiCollection(halaqaID: id, collectionName: collectionName, data: data);
-  //   // result.firestore.collection(collectionName!).add(data!);
-  //   // return "done";
-  // }
-
-  // addStudent(
-  //     String stdPhone, String memorizerEmail, Map<String, dynamic> data) async {
-
-  //        final snapshot = await _db
-  //       .collectionGroup("Halaqat").where("m-email",isEqualTo: memorizerEmail);
-  //       // snapshot.collection("Halaqat").add({'center':data['center'],'city':data['city'],'m-email':data['email']});
-  //   addCollection(data:data,collectionName:"Students");
-  //   // final snapshot = await _snapshot(memorizerEmail);
-  //   // String halaqaID = await getHalaqaID(memorizerEmail);
-  //   // String studentID = await getStudentID(stdPhone, memorizerEmail);
-  //   // var r = await snapshot.firestore
-  //   //     .doc("/Halaqat/" + halaqaID)
-  //   //     .collection("/Students")
-  //   //     .add(data);
-  //   //     print(r.runtimeType); //add new record
-  //   //     print(" rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr "); //add new record
-  // }
-
-  // updateStudent(
-  //     String stdPhone, String memorizerEmail, Map<Object, Object> data) async {
-  //   final snapshot = await _snapshot(memorizerEmail);
-  //   String halaqaID = await getHalaqaID(memorizerEmail);
-  //   String studentID = await getStudentCollection(stdPhone, memorizerEmail);
-  //   var z = await snapshot.firestore
-  //       .doc("/Halaqat/" + halaqaID)
-  //       .collection("/Students")
-  //       .doc(studentID)
-  //       .update(data); // add "" to filed ""
-  //   //get student by phone
-  // }
-
-//   addStudentRecord(
-//       {String? stdID,
-//       String? memorizerEmail,
-//       Map<String, dynamic>? data}) async {
-//     print(" ************* ");
-//     getStudentCollection(stdID!, memorizerEmail!);
-//     addMutiCollectionUsingStdID(
-//         id: stdID, collectionName: "Records", data: data);
-// //     final snapshot = await _snapshot(memorizerEmail!);
-// //     String halaqaID = await getHalaqaID(memorizerEmail);
-// //     String studentID = await getStudentCollection(stdID!, memorizerEmail);
-// //     var s = await snapshot.firestore.collection("/Students");
-// //         print("sssssssssssssss");
-// //         print(s.path);
-// //         var temp=await s.where("IDn",isEqualTo:int.parse(stdID)).get();
-
-// // print("tttttttttttttt");
-// // print(await  temp.docs.first.id);
-//     // var r=await temp.collection("/Records")
-//     // .add(data!); //add new record
-//   }
-
-//   Future<List<HalaqaModel>> getHalaqatData() async {
-//     final snapshots = await _db.collection("Halaqat").snapshots().first;
-//     var docs = await snapshots.docs;
-// // var a=await docs;
-//     print(docs.elementAt(0).id);
-//     final snapshot = await _db.collection("Halaqat").get();
-//     final userData = snapshot.docs
-//         .map((halaqa) => HalaqaModel.fromSnapshot(halaqa))
-//         .toList();
-//     // print(userData);
-//     return userData;
-//   }
-
-  // Future<Map<dynamic, Map>> getDataWithID(String docName) async {
-  //   Map<String, Map> _doc = {};
-  //   var i = await FirebaseFirestore.instance.collection(docName).get();
-  //   i?.docs.forEach((doc) {
-  //     Map temp = doc.data() as Map;
-  //     _doc.addEntries({doc.id.toString(): temp}.entries);
-  //   });
-  //   return _doc;
-  // }
-
-  // upload(List<Map<String, dynamic>> dataList) async {
-  //   var users = await FirebaseFirestore.instance.collection('users');
-
-  //   dataList.forEach((std) async {
-  //     // final json = {
-  //     //   'f_name': '${std['f_name']}',
-  //     //   'm_name': '${std['m_name']}',
-  //     //   'l_name': '${std['l_name']}',
-  //     //   'IDn': '${std['IDn']}',
-  //     //   'DOB': '${std['DOB']}',
-  //     //   'phone': '${std['phone']}',
-  //     //   'school': '${std['school']}',
-  //     //   'level': '${std['level']}',
-  //     //   'score': '${std['score']}',
-  //     //   'attendance': '${std['attendance']}',
-  //     //   'commitment': '${std['commitment']}',
-  //     //   'points': '${std['points']}',
-  //     // };
-  //     users.doc(std['id'].toString()).set(std);
-  //     // .add(json)
-  //     // .then((value) => print(" one data added to firestore"));
-  //   });
-
-  //   // var records = FirebaseFirestore.instance.collection('records');
-  //   // dataList.forEach((std) async {
-  //   //   final json = {
-  //   //     'std-id': '${std['std-id']}',
-  //   //     'sourah': '${std['sourah']}',
-  //   //     'date': '${std['date']}',
-  //   //     'from': '${std['from']}',
-  //   //     'to': '${std['to']}',
-  //   //     'quality': '${std['quality']}',
-  //   //     'pages-count': '${std['pages-count']}',
-  //   //     'commitment': '${std['commitment']}'
-  //   //   };
-  //   //   await records
-  //   //       .add(json)
-  //   //       .then((value) => print(" one data added to firestore"));
-  //   // });
-
-  //   // var attendance = FirebaseFirestore.instance.collection('attendance');
-  //   // dataList.forEach((std) async {
-  //   //   final json = {
-  //   //     'std-id': '${std['std-id']}',
-  //   //     'name': '${std['name']}',
-  //   //     'date': '${std['date']}'
-  //   //   };
-  //   //   await attendance
-  //   //       .add(json)
-  //   //       .then((value) => print(" one data added to firestore"));
-  //   // });
-  // }
-
-  // updateDocument(String id, newData) async {
-  //   var user = await FirebaseFirestore.instance.collection('users').doc(id);
-  //   // print(data);
-  //   user.update(newData);
-  // }
-
-  // updateDocumentField(String id, String fieldName, newData) async {
-  //   var user = await FirebaseFirestore.instance.collection('users').doc(id);
-  //   // print(data);
-  //   user.update({fieldName: newData});
-  // }
+  syncRecords(QuerySnapshot cloudStudents, mEmail) async {
+    try {
+      var _cloudStudents = cloudStudents.docs;
+      for (int i = 0; i < _cloudStudents.length; i++) {
+        var stdDoc = _cloudStudents[i];
+        Map cloudStudent = await stdDoc.data() as Map;
+        MapStyle().printMap(cloudStudent);
+        DateTime cloudeLastUpdate =
+            _reformateDate(stdDoc['last_update'].toString());
+        List<Map> tempLastUpdate = await db.readData(
+            "select * from Students where IDn=${cloudStudent['IDn']}");
+        MapStyle().printMap(tempLastUpdate.single);
+        DateTime localLastUpdate =
+            _reformateDate(tempLastUpdate[0]['last_update'].toString());
+        if (cloudeLastUpdate.compareTo(localLastUpdate) >= 1) {
+          if (doseStdHasRecords(mEmail, cloudStudent['IDn'])) {
+            var cloudeRecords = List<QueryDocumentSnapshot>.from(
+                await getStudentRecords(
+                    mEmail: mEmail, idn: cloudStudent['IDn'].toString()));
+            // cloudeRecords.forEach((rd) async
+            for (int j = 0; j < cloudeRecords.length; j++) {
+              var rd = cloudeRecords[j];
+              Map record = rd.data() as Map;
+              if (record['isSynced'] == "false") {
+                MapStyle().printMap(record);
+                await db.insertData(
+                    "INSERT INTO 'Records' (id,std_id, surah, date, frm, t, quality, pgs_count, commitment, type,isSynced) VALUES ('${rd.id}' , '${cloudStudent['IDn'].toString()}','${record['surah']}','${record['date']}',${record['from']},${record['to']},${record['quality']},${record['pgsCount']},${record['commitment']},'${{
+                  record['type']
+                }}','true')");
+                List<Map> oldStudentData = await db.readData(
+                    " Select score,commitment, points, attendance, last_update From 'Students' WHERE IDn=${cloudStudent['IDn']}");
+                var _score = record['pgsCount'] * record['quality'];
+                double _factor = (record['type'] == "مراجعة") ? 0.5 : 1;
+                var _points = (_score * _factor);
+                DateTime now = DateTime.now();
+                DateTime date = _reformateDate(now.toString());
+                // intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+                await db.updateData(
+                    "UPDATE 'Students'  SET commitment= ${record['commitment'] + oldStudentData[0]['commitment']}, points=${_points + oldStudentData[0]['points']} , attendance='${oldStudentData[0]['attendance'] + 1}' , last_update='${date.toString()}' WHERE IDn=${cloudStudent['IDn']}");
+                MapStyle().printMap(cloudStudent);
+                await setRecordSynced(
+                    idn: cloudStudent['IDn'].toString(),
+                    mEmail: mEmail,
+                    recordID: rd.id);
+              }
+            }
+          }
+        } else if (cloudeLastUpdate.compareTo(localLastUpdate) <= -1) {
+          var localRecords = await db.readData(
+              "select * from Records where std_id=${cloudStudent['IDn']}");
+          // localRecords.forEach((record) async {
+          for (int j = 0; j < localRecords.length; j++) {
+            var record = localRecords[j];
+            MapStyle().printMap(record);
+            if (record['isSynced'] == "false") {
+              // await db.updateData(
+              //     "UPDATE Records Set isSynced='true' where id=${record['id']}");
+              MapStyle().printMap(record);
+              await addRecord(
+                  idn: record['std_id'],
+                  data: record as Map<String, dynamic>,
+                  mEmail: mEmail);
+            }
+          }
+        }
+        // var cloudeRecords;
+        // try {} catch (e) {
+        // }
+        // else if (cloudeRecords.length > localRecords.length) {
+        //   _cloudStudents.forEach((student) async {
+        //     cloudeRecords.forEach((rd) async {
+        //       Map record = rd.data() as Map;
+        //       if (record['isSynced'] == "false") {
+        //         await db.insertData(
+        //             "INSERT INTO 'Records' (std_id, surah, date, frm, t, quality, pgs_count, commitment, type,isSynced) VALUES ('${student['IDn'].toString()}','${record['surah']}','${record['date']}',${record['from']},${record['to']},${record['quality']},${record['pgsCount']},${record['commitment']},'${{
+        //           record['type']
+        //         }}','true')");
+        //         DateTime now = DateTime.now();
+        //         String date = intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+        //         List<Map> oldStudentData = await db.readData(
+        //             " Select score,commitment, points, attendance, last_update From 'Students' WHERE IDn=${student['IDn']}");
+        //         var _score = record['pgsCount'] * record['quality'];
+        //         double _factor = (record['type'] == "مراجعة") ? 0.5 : 1;
+        //         var _points = (_score * _factor);
+        //         await db.updateData(
+        //             "UPDATE 'Students'  SET commitment= ${record['commitment'] + oldStudentData[0]['commitment']}, points=${_points + oldStudentData[0]['points']} , attendance='${oldStudentData[0]['attendance'] + 1}' , last_update='$date' WHERE IDn=${student['IDn']}");
+        //       }
+        //       var cloudRecord = await  setRecordSynced(
+        //           idn: student['IDn'].toString(), mEmail: memorizerEmail);
+        //       cloudeRecords;
+        //     });
+        //   });
+        // }
+      }
+      return true;
+    } catch (e) {
+      // QuickAlert.show(
+      //     context: context,
+      //     type: QuickAlertType.error,
+      //     text: e.toString(),
+      //     title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+      return false;
+    }
+  }
 }
