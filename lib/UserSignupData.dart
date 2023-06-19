@@ -42,7 +42,7 @@ myFirestore.addMemorizer({'phone':phone,'center':center,'city':city,'name':name,
                   textDirection: TextDirection.rtl,
                   child: ListView(
                     padding:
-                        EdgeInsets.only(top:120, bottom: 50),
+                        EdgeInsets.only(top:vh*0.1, bottom: 50),
                     children: [
                       Container(
                         alignment: Alignment.center,
@@ -51,14 +51,11 @@ myFirestore.addMemorizer({'phone':phone,'center':center,'city':city,'name':name,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              SizedBox(
-                                height: vh * 0.001,
-                              ),
                               Image.asset(
                                 "assets/icon/logo.png",
                                 width: 200,
                               ),
-                              Text( "تسجيل الدخول",
+                              Text( "بيانات الحلقة",
                                   style: TextStyle(
                                       color: Colors.black,
                                       fontSize: 32,
@@ -84,6 +81,7 @@ myFirestore.addMemorizer({'phone':phone,'center':center,'city':city,'name':name,
                           ),
                           Container(
                             child: TextFormField(
+                              keyboardType: TextInputType.phone,
                               textInputAction: TextInputAction.next,
                               decoration: InputDecoration(
                                   border: UnderlineInputBorder(),

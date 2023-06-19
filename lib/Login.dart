@@ -30,14 +30,15 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   final _centerController = TextEditingController();
   final _cityController = TextEditingController();
   final _nameController = TextEditingController();
-  SqlDb db = SqlDb();
+  // SqlDb db = SqlDb();
   dynamic singup = false;
+  bool _showPassword = false;
+  bool _showRePassword = false;
 
   _signUp(email, password) async {
     try {
       await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-      
     } on FirebaseAuthException catch (e) {
       var msg = e.code.toString();
       print(msg);
@@ -63,31 +64,32 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     try {
       await FirebaseAuth.instance
           .signInWithEmailAndPassword(email: email, password: password);
-    return true;
-
+      return true;
     } on FirebaseAuthException catch (e) {
       var msg = e.code.toString();
       print(" ================ Error ===================");
       print(msg);
       if (msg == "user-not-found") {
-      QuickAlert.show(context: context, type: QuickAlertType.error, text:"لا يوجد مستخدم يملك هذه البيانات, تأكد من بياناتك او أنشأ حساب جديد",title:" خطأفي تسجيل الدخول");
+        QuickAlert.show(
+            context: context,
+            type: QuickAlertType.error,
+            text:
+                "لا يوجد مستخدم يملك هذه البيانات, تأكد من بياناتك او أنشأ حساب جديد",
+            title: " خطأفي تسجيل الدخول");
       } else if (msg == "wrong-password") {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("اسم المستخدم او/و كلمة المرور غير صحيحين")));
       } else if (msg == "invalid-email") {
         ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text("البريد الإلكتروني غير مقبول")));
-      }else if(msg=="network-request-failed"){
-        ScaffoldMessenger.of(context).showSnackBar( 
-            SnackBar(content: Text("لا يوجد اتصال بالانترنت")));
-      } 
-      
-      else {
+      } else if (msg == "network-request-failed") {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("لا يوجد اتصال بالانترنت")));
+      } else {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(msg)));
       }
-    return false;
-
+      return false;
     }
     // if(remember)_activeRemember(email, password);
   }
@@ -118,6 +120,13 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   //     await db.updateData("UPDATE 'Login' SET email='$email',password='$password',remember= 'true' ");
 
   // }
+  _togglePassvisibility(field) {
+    setState(() {
+      field == 'password'
+          ? _showPassword = !_showPassword
+          : _showRePassword = !_showRePassword;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -129,7 +138,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       builder: (context, snapshots) {
         if (snapshots.hasData) {
           return EmailVerification(
-            memorizerEmail: _emailController.text.toString(),signUp: singup,
+            memorizerEmail: _emailController.text.toString(),
+            signUp: singup,
           );
         } else {
           return Stack(
@@ -144,8 +154,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 body: Directionality(
                   textDirection: TextDirection.rtl,
                   child: ListView(
-                    padding:
-                        EdgeInsets.only(top:200, bottom: 50),
+                    padding: EdgeInsets.only(top: vh * 0.2, bottom: 50),
                     children: [
                       Container(
                         alignment: Alignment.center,
@@ -188,6 +197,10 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                   ),
                                   Container(
                                     child: TextFormField(
+                                      obscureText: !_showPassword,
+                                      textInputAction: singup
+                                          ? TextInputAction.next
+                                          : TextInputAction.done,
                                       controller: _passwordController,
                                       validator: (value) {
                                         if (value == null || value.isEmpty) {
@@ -196,44 +209,68 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                         return null;
                                       },
                                       decoration: InputDecoration(
+                                          suffixIcon: GestureDetector(
+                                            onTap: () {
+                                              _togglePassvisibility('password');
+                                            },
+                                            child: Icon(
+                                              !_showPassword
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                            ),
+                                          ),
                                           border: UnderlineInputBorder(),
                                           label: Text('أدخل كملة المرور'),
                                           focusColor: Colors.red),
                                     ),
                                     width: vw * 0.70,
-                                  ), singup?Container(
-                            child: TextFormField(
-                              textInputAction: TextInputAction.next,
-                              decoration: InputDecoration(
-                                  border: UnderlineInputBorder(),
-                                  label: Text(' إعادة كلمة المرور'),
-                                  focusColor: Colors.red),
-                              controller: _repasswordController,
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'يجب تعبئة هذه الخانة';
-                                } else if (value.toString() !=
-                                    _repasswordController.text.toString()) {
-                                  return 'كلمة السر غير متطابقة';
-                                }
-                                return null;
-                              },
-                            ),
-                            width: vw * 0.70,
-                          ):SizedBox(),
-                                    ],
+                                  ),
+                                  singup
+                                      ? Container(
+                                          child: TextFormField(
+                                            obscureText: !_showRePassword,
+                                            decoration: InputDecoration(
+                                              suffixIcon: GestureDetector(
+                                            onTap: () {
+                                              _togglePassvisibility('rePassword');
+                                            },
+                                            child: Icon(
+                                              !_showRePassword
+                                                  ? Icons.visibility
+                                                  : Icons.visibility_off,
+                                            ),
+                                          ),
+                                                border: UnderlineInputBorder(),
+                                                label:
+                                                    Text(' إعادة كلمة المرور'),
+                                                focusColor: Colors.red),
+                                            controller: _repasswordController,
+                                            validator: (value) {
+                                              if (value == null ||
+                                                  value.isEmpty) {
+                                                return 'يجب تعبئة هذه الخانة';
+                                              } else if (value.toString() !=
+                                                  _repasswordController.text
+                                                      .toString()) {
+                                                return 'كلمة السر غير متطابقة';
+                                              }
+                                              return null;
+                                            },
+                                          ),
+                                          width: vw * 0.70,
+                                        )
+                                      : SizedBox(),
+                                ],
                               ),
                             ),
                             ElevatedButton(
-                                onPressed: ()async {
+                                onPressed: () async {
                                   if (_formKey.currentState!.validate()) {
                                     singup
                                         ? {
                                             _signUp(
-                                              _emailController.text.trim(),
-                                              _passwordController.text.trim()
-                                              
-                                            )
+                                                _emailController.text.trim(),
+                                                _passwordController.text.trim())
                                           }
                                         : {
                                             await _auth(
@@ -241,8 +278,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                                         .trim(),
                                                     _passwordController.text
                                                         .trim())
-                                                ? Navigator.pushReplacement(context,
-                                                    MaterialPageRoute(
+                                                ? Navigator.pushReplacement(
+                                                    context, MaterialPageRoute(
                                                         builder: (context) {
                                                     return Home();
                                                   }))
@@ -250,8 +287,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                           };
                                   }
                                 },
-                                child: Text(
-                                    singup ? "التالي" : "تسجيل الدخول ")),
+                                child:
+                                    Text(singup ? "التالي" : "تسجيل الدخول ")),
                             SizedBox(
                               height: 20,
                             ),

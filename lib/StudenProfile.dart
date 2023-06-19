@@ -9,17 +9,18 @@ import 'package:flutter/src/widgets/ticker_provider.dart';
 // import 'package:tahfeez_app/NewRecord.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
+import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'sqfDB.dart';
 import 'dart:ui' as def;
 
 class StudentProfile extends StatefulWidget {
-  final studentSysID;
+  final studentIDn;
   final String memorizerEmail;
 
   const StudentProfile({
     super.key,
-    required this.studentSysID, required this.memorizerEmail,
+    required this.studentIDn, required this.memorizerEmail,
   });
   @override
   State<StudentProfile> createState() => _StudentProfileState();
@@ -34,13 +35,14 @@ class _StudentProfileState extends State<StudentProfile>
     super.initState();
   }
 
+  Firestore myFierstor = Firestore();
   _getStdAge(String dob) {
     int thisYear = DateTime.now().year;
     int stdDate = int.parse(dob.split('/').last);
     return thisYear - stdDate;
   }
 
-  SqlDb db = SqlDb();
+  // SqlDb db = SqlDb();
   late TextStyle cardTextStyle =
       TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, height: 2.5);
   late TextStyle cardMainTextStyle = TextStyle(
@@ -49,20 +51,30 @@ class _StudentProfileState extends State<StudentProfile>
       height: 2.5,
       color: Colors.green);
 
-  Future<List<Map>> _getStudentDate() async {
-    List<Map> result = await db
-        .readData("SELECT * FROM students WHERE IDn=${widget.studentSysID}");
-    return result;
-  }
+_getStudentDate() async{
+ return await myFierstor.getStudentData(mEmail: widget.memorizerEmail, idn: widget.studentIDn);
+}
 
-  Future<List<Map>> _getStudentHistory() async {
-    List<Map> result = await db
-        .readData("SELECT * FROM Records WHERE std_id=${widget.studentSysID}");
-    print(result[0]["date"].split(" ")[0]);
-    print(" ******************** ");
-    print(DateTime.now().toString().split(" ")[0]);
-    return result;
-  }
+  // Future<List<Map>> _getStudentDate() async {
+  //   List<Map> result = await db
+  //       .readData("SELECT * FROM students WHERE IDn=${widget.studentSysID}");
+  //   return result;
+  // }
+
+
+_getStudentHistory()async{
+  await myFierstor.getRecordDocs(mEmail: widget.memorizerEmail, idn: widget.studentIDn);
+
+}
+
+  // Future<List<Map>> _getStudentHistory() async {
+  //   List<Map> result = await db
+  //       .readData("SELECT * FROM Records WHERE std_id=${widget.studentSysID}");
+  //   print(result[0]["date"].split(" ")[0]);
+  //   print(" ******************** ");
+  //   print(DateTime.now().toString().split(" ")[0]);
+  //   return result;
+  // }
 
   // Future<List<Map>> _getStudentTests() async {
   //   List<Map> result = await db

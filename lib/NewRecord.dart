@@ -1,7 +1,9 @@
 // import 'package:intl/intl.dart' as intl;
 // ignore_for_file: avoid_print, implementation_imports, prefer_typing_uninitialized_variables, sort_child_properties_last, file_names
 
+import 'dart:io';
 import 'dart:math';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/src/widgets/container.dart';
@@ -16,7 +18,8 @@ import 'sqfDB.dart';
 import 'package:intl/intl.dart' as intl;
 
 class NewRecord extends StatefulWidget {
-  final int stdID;
+  final String stdID;
+  final String stdName;
   final String memorizerEmail;
   final studentPhone;
 
@@ -24,7 +27,8 @@ class NewRecord extends StatefulWidget {
       {super.key,
       required this.stdID,
       required this.memorizerEmail,
-      this.studentPhone});
+      this.studentPhone,
+      required this.stdName});
 
   @override
   State<NewRecord> createState() => _NewRecordState();
@@ -33,7 +37,7 @@ class NewRecord extends StatefulWidget {
 class _NewRecordState extends State<NewRecord>
     with SingleTickerProviderStateMixin {
   final _formKey = GlobalKey<FormState>();
-  SqlDb db = SqlDb();
+  // SqlDb db = SqlDb();
   Firestore myFierstor = Firestore();
 
   // late AnimationController _controller;
@@ -58,14 +62,23 @@ class _NewRecordState extends State<NewRecord>
     return randomString;
   }
 
-  save(String stdID, String email, String surah, String from, String to,
+  Future save(String stdID, String email, String surah, String from, String to,
       double quality, double pgsCount, double commitment, double type) async {
     try {
+      QuickAlert.show(
+          context: context,
+          type: QuickAlertType.loading,
+          title: "جاري حفظ البيانات");
+      //     var n = await InternetAddress.lookup('google.com');
+      // if (!n.isEmpty || n != null) {
+      //   print("enable network");
+      //   Firestore.ref.enableNetwork();
+      // }
       // add record to local database
-      String localRecordID = await db.addRecord(
-          stdID, surah, from, to, quality, pgsCount, commitment, type);
+      // String localRecordID = await db.addRecord(
+      //     stdID, surah, from, to, quality, pgsCount, commitment, type);
       // add record to cloud database
-      String cloudRecordID = await myFierstor
+       await myFierstor
           .addRecord(idn: stdID.toString(), mEmail: email, data: {
         'surah': surah,
         'from': from,
@@ -76,11 +89,27 @@ class _NewRecordState extends State<NewRecord>
         'type': type,
         'isSynced': 'false'
       });
+
+      Map stdOldData =
+          await myFierstor.getStudentData(mEmail: email, idn: stdID.toString());
+      var newPoints =
+          double.parse(stdOldData['points']) + (pgsCount * quality) * type;
+      var newAttendance = double.parse(stdOldData['attendance']) + 1;
+      await myFierstor.setStudentData(
+          mEmail: email,
+          idn: stdID.toString(),
+          data: {
+            'points': newPoints.toString(),
+            'attendance': newAttendance.toString()
+          });
       // update record id field in local database
-      await db.updateRecordID(localRecordID, cloudRecordID);
+      // await db.updateRecordID(localRecordID, cloudRecordID);
       // update lastUpdate field in student cloud doc.
-      myFierstor.setStudentLastUpdate(mEmail: email, idn: stdID.toString());
+      await myFierstor
+          .setStudentLastUpdate(mEmail: email, idn: stdID.toString())
+          .then((value) => Navigator.pop(context));
     } catch (e) {
+      print(e);
       QuickAlert.show(
           context: context,
           type: QuickAlertType.error,
@@ -90,18 +119,25 @@ class _NewRecordState extends State<NewRecord>
   }
 
   Future<String> _getStdName() async {
-    List<Map> stdData = await db.readData(
-        "SELECT f_name , l_name  FROM students WHERE IDn='${widget.stdID}'");
-    // commitment = stdData[0].values.toList()[3];
-    // points = stdData[0].values.toList()[4];
-
-    String name;
-    name = stdData[0].values.toList()[0].toString() +
-        " " +
-        stdData[0].values.toList()[1].toString();
-
+    var std = await myFierstor.getStudentData(
+        idn: widget.stdID.toString(), mEmail: widget.memorizerEmail);
+    var name = await ("""${std['f_name']} ${std['l_name']}""");
     return name;
   }
+
+  // Future<String> _getStdName() async {
+  //   List<Map> stdData = await db.readData(
+  //       "SELECT f_name , l_name  FROM students WHERE IDn='${widget.stdID}'");
+  //   // commitment = stdData[0].values.toList()[3];
+  //   // points = stdData[0].values.toList()[4];
+
+  //   String name;
+  //   name = stdData[0].values.toList()[0].toString() +
+  //       " " +
+  //       stdData[0].values.toList()[1].toString();
+
+  //   return name;
+  // }
 
   String dropDownTypeValue = "حفظ";
   List<DropdownMenuItem<String>> typeOfRecord = [
@@ -259,236 +295,237 @@ class _NewRecordState extends State<NewRecord>
     SearchFieldListItem("الفلق", item: "الفلق"),
     SearchFieldListItem("الناس", item: "الناس"),
   ];
+// checkConnection()async{
+//  try{ var n = await InternetAddress.lookup('google.com');
+//       if (!n.isEmpty || n != null) {
+//         print("enable network");
+//         Firestore.ref.enableNetwork();
+//       }}catch(e){}
+// }
+
   @override
   Widget build(BuildContext context) {
     var _screenWidth = MediaQuery.of(context).size.width;
     // var _screenHeight = MediaQuery.of(context).size.height;
+    // checkConnection();
     return Scaffold(
         appBar: AppBar(
           title: Text("حفظ جديد "),
         ),
         body: Directionality(
-          textDirection: TextDirection.rtl,
-          child: FutureBuilder(
-              future: _getStdName(),
-              builder: (context, snapshot) {
-                return ListView(padding: EdgeInsets.all(20.0), children: [
-                  CircleAvatar(
-                    //image
-                    radius: 50,
-                    backgroundImage: AssetImage("assets/images/splash.jpg"),
-                  ),
-                  SizedBox(
-                    //white space
-                    height: 50,
-                  ),
-                  Text(
-                    //std name
-                    snapshot.data.toString(),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                  ),
-                  SizedBox(
-                    //white space
-                    height: 20,
-                  ),
-                  Container(
-                      // height: 70,
-                      child: Form(
-                          key: _formKey,
-                          child: Column(
+            textDirection: TextDirection.rtl,
+            child: ListView(padding: EdgeInsets.all(20.0), children: [
+              CircleAvatar(
+                //image
+                radius: 50,
+                backgroundImage: AssetImage("assets/images/splash.jpg"),
+              ),
+              SizedBox(
+                //white space
+                height: 50,
+              ),
+              Text(
+                //std name
+                widget.stdName,
+                textAlign: TextAlign.center,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
+              ),
+              SizedBox(
+                //white space
+                height: 20,
+              ),
+              Container(
+                  // height: 70,
+                  child: Form(
+                      key: _formKey,
+                      child: Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Container(child: dropdownButton()),
-                                  Container(
-                                      width: _screenWidth * 0.5,
-                                      child: SearchField(
-                                        textInputAction: TextInputAction.next,
-                                        autoCorrect: true,
-                                        hint: 'اختر اسم السورة',
-                                        searchInputDecoration: InputDecoration(
-                                            enabledBorder: OutlineInputBorder(
-                                                borderSide: BorderSide(
-                                                    color: Colors.green))),
-                                        itemHeight: 50,
-                                        maxSuggestionsInViewPort: 6,
-                                        suggestionsDecoration: BoxDecoration(
-                                            color: Colors.white,
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        onSuggestionTap: (value) {
-                                          setState(() {
-                                            this.selectedSurahValue =
-                                                value.item.toString();
-                                          });
-                                        },
-                                        suggestions: souras,
-                                        validator: (value) {
-                                          print(value);
-                                          if (this.selectedSurahValue == null ||
-                                              this
-                                                  .selectedSurahValue!
-                                                  .isEmpty) {
-                                            return 'يجب الاختيار من القائمة';
-                                          }
-                                          return null;
-                                        },
-                                      )),
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Container(
-                                    child: TextFormField(
-                                      //from
-                                      textInputAction: TextInputAction.next,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'يجب تعبئة هذه الخانة';
-                                        }
-                                        return null;
-                                      },
-                                      controller: _frmController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: const InputDecoration(
-                                          labelText: 'من',
-                                          hintText: 'أدخل رقم الآية'),
-                                    ),
-                                    width: _screenWidth * 0.4,
-                                  ),
-                                  Container(
-                                    child: TextFormField(
-                                        //to
-                                        textInputAction: TextInputAction.next,
-                                        validator: (value) {
-                                          if (value == null || value.isEmpty) {
-                                            return 'يجب تعبئة هذه الخانة';
-                                          }
-                                          return null;
-                                        },
-                                        controller: _tController,
-                                        keyboardType: TextInputType.number,
-                                        decoration: const InputDecoration(
-                                            labelText: 'إلى',
-                                            hintText: 'أدخل رقم الآية')),
-                                    width: _screenWidth * 0.4,
-                                  )
-                                ],
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceEvenly,
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Container(
-                                    // qoulity text
-                                    child: Text(
-                                      "جودة الحفظ (من 10)",
-                                      textAlign: TextAlign.center,
-                                    ),
-                                    width: _screenWidth * 0.4,
-                                  ),
-                                  Container(
-                                    child: TextFormField(
-                                      //quality
-                                      textInputAction: TextInputAction.next,
-                                      validator: (value) {
-                                        if (value == null || value.isEmpty) {
-                                          return 'يجب تعبئة هذه الخانة';
-                                        } else if (double.parse(value) > 10) {
-                                          return 'لا يمكنك ادخال رقم اكبر من 10';
-                                        } else if (double.parse(value) <= 0) {
-                                          return "يجب ان تكون الجودة اكبر من 0";
-                                        }
-                                        return null;
-                                      },
-                                      controller: _qualityController,
-                                      keyboardType: TextInputType.number,
-                                    ),
-                                    width: _screenWidth * 0.4,
-                                  ),
-                                ],
-                              ),
+                              Container(child: dropdownButton()),
+                              Container(
+                                  width: _screenWidth * 0.5,
+                                  child: SearchField(
+                                    textInputAction: TextInputAction.next,
+                                    autoCorrect: true,
+                                    hint: 'اختر اسم السورة',
+                                    searchInputDecoration: InputDecoration(
+                                        enabledBorder: OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                                color: Colors.green))),
+                                    itemHeight: 50,
+                                    maxSuggestionsInViewPort: 6,
+                                    suggestionsDecoration: BoxDecoration(
+                                        color: Colors.white,
+                                        borderRadius:
+                                            BorderRadius.circular(10)),
+                                    onSuggestionTap: (value) {
+                                      setState(() {
+                                        this.selectedSurahValue =
+                                            value.item.toString();
+                                      });
+                                    },
+                                    suggestions: souras,
+                                    validator: (value) {
+                                      print(value);
+                                      if (this.selectedSurahValue == null ||
+                                          this.selectedSurahValue!.isEmpty) {
+                                        return 'يجب الاختيار من القائمة';
+                                      }
+                                      return null;
+                                    },
+                                  )),
+                            ],
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
                               Container(
                                 child: TextFormField(
-                                  //page cout
+                                  //from
                                   textInputAction: TextInputAction.next,
-                                  decoration: const InputDecoration(
-                                    labelText: 'عدد الصفحات',
-                                  ),
                                   validator: (value) {
                                     if (value == null || value.isEmpty) {
                                       return 'يجب تعبئة هذه الخانة';
-                                    } else if (double.parse(value) < 0.5) {
-                                      return 'لا يمكن ادخال قيمة اقل من 0.5';
                                     }
                                     return null;
                                   },
-                                  controller: _pgsCountController,
-                                  keyboardType: TextInputType.numberWithOptions(
-                                      decimal: false, signed: false),
+                                  controller: _frmController,
+                                  keyboardType: TextInputType.number,
+                                  decoration: const InputDecoration(
+                                      labelText: 'من',
+                                      hintText: 'أدخل رقم الآية'),
                                 ),
                                 width: _screenWidth * 0.4,
                               ),
                               Container(
                                 child: TextFormField(
-                                  //commitment
-                                  decoration: const InputDecoration(
-                                      labelText: 'الإلتزام', hintText: "من 10"),
-                                  validator: (value) {
-                                    if (value == null || value.isEmpty) {
-                                      return 'يجب تعبئة هذه الخانة';
-                                    }
-                                    if (double.parse(value) > 10) {
-                                      return 'لا يمكنك ادخال رقم اكبر من 10';
-                                    }
-                                    return null;
-                                  },
-                                  controller: _commitmentController,
-                                  keyboardType: TextInputType.number,
-                                ),
+                                    //to
+                                    textInputAction: TextInputAction.next,
+                                    validator: (value) {
+                                      if (value == null || value.isEmpty) {
+                                        return 'يجب تعبئة هذه الخانة';
+                                      }
+                                      return null;
+                                    },
+                                    controller: _tController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                        labelText: 'إلى',
+                                        hintText: 'أدخل رقم الآية')),
                                 width: _screenWidth * 0.4,
                               )
                             ],
-                          ))),
-                  SizedBox(
-                    //white space
-                    height: 50,
-                  ),
-                  Container(
-                      //save btn
-                      width: _screenWidth * 0.8,
-                      height: 50,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            // print("${_surahController.text}     ${this.selectedSurahValue}");
-                            save(
-                                widget.stdID.toString(),
-                                widget.memorizerEmail,
-                                this.selectedSurahValue.toString(),
-                                _frmController.text,
-                                _tController.text,
-                                double.parse(_qualityController.text),
-                                double.parse(_pgsCountController.text),
-                                double.parse(_commitmentController.text),
-                                factor);
-                            try {
-                              Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
-                            } on FirebaseException catch (e) {
-                              QuickAlert.show(
-                                  context: context,
-                                  type: QuickAlertType.error,
-                                  text: e.toString(),
-                                  title:
-                                      "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
-                            }
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.end,
+                            children: [
+                              Container(
+                                // qoulity text
+                                child: Text(
+                                  "جودة الحفظ (من 10)",
+                                  textAlign: TextAlign.center,
+                                ),
+                                width: _screenWidth * 0.4,
+                              ),
+                              Container(
+                                child: TextFormField(
+                                  //quality
+                                  textInputAction: TextInputAction.next,
+                                  validator: (value) {
+                                    if (value == null || value.isEmpty) {
+                                      return 'يجب تعبئة هذه الخانة';
+                                    } else if (double.parse(value) > 10) {
+                                      return 'لا يمكنك ادخال رقم اكبر من 10';
+                                    } else if (double.parse(value) <= 0) {
+                                      return "يجب ان تكون الجودة اكبر من 0";
+                                    }
+                                    return null;
+                                  },
+                                  controller: _qualityController,
+                                  keyboardType: TextInputType.number,
+                                ),
+                                width: _screenWidth * 0.4,
+                              ),
+                            ],
+                          ),
+                          Container(
+                            child: TextFormField(
+                              //page cout
+                              textInputAction: TextInputAction.next,
+                              decoration: const InputDecoration(
+                                labelText: 'عدد الصفحات',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'يجب تعبئة هذه الخانة';
+                                } else if (double.parse(value) < 0.5) {
+                                  return 'لا يمكن ادخال قيمة اقل من 0.5';
+                                }
+                                return null;
+                              },
+                              controller: _pgsCountController,
+                              keyboardType: TextInputType.numberWithOptions(
+                                  decimal: false, signed: false),
+                            ),
+                            width: _screenWidth * 0.4,
+                          ),
+                          Container(
+                            child: TextFormField(
+                              //commitment
+                              decoration: const InputDecoration(
+                                  labelText: 'الإلتزام', hintText: "من 10"),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'يجب تعبئة هذه الخانة';
+                                }
+                                if (double.parse(value) > 10) {
+                                  return 'لا يمكنك ادخال رقم اكبر من 10';
+                                }
+                                return null;
+                              },
+                              controller: _commitmentController,
+                              keyboardType: TextInputType.number,
+                            ),
+                            width: _screenWidth * 0.4,
+                          )
+                        ],
+                      ))),
+              SizedBox(
+                //white space
+                height: 50,
+              ),
+              Container(
+                  //save btn
+                  width: _screenWidth * 0.8,
+                  height: 50,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        // print("${_surahController.text}     ${this.selectedSurahValue}");
+                        try {
+                          save(
+                                  widget.stdID.toString(),
+                                  widget.memorizerEmail,
+                                  this.selectedSurahValue.toString(),
+                                  _frmController.text,
+                                  _tController.text,
+                                  double.parse(_qualityController.text),
+                                  double.parse(_pgsCountController.text),
+                                  double.parse(_commitmentController.text),
+                                  factor)
+                              .then((value) => Navigator.of(context)
+                                  .popUntil((route) => route.isFirst));
+                        } catch (e) {
+                          QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.error,
+                              text: e.toString(),
+                              title:
+                                  "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+                        }
 // myFierstor.addStudent(
 //                                 widget.studentPhone.toString(),
 //                                 widget.memorizerEmail, {
@@ -501,15 +538,13 @@ class _NewRecordState extends State<NewRecord>
 //                               "commetment": _commitmentController.text.toString(),
 
 //                             });
-                          }
-                        },
-                        child: Text(
-                          "SAVE",
-                        ),
-                      ))
-                ]);
-              }),
-        ),
+                      }
+                    },
+                    child: Text(
+                      "SAVE",
+                    ),
+                  ))
+            ])),
         bottomNavigationBar: BottomBar(
           dailyReplace: true,
           dailyPush: false,

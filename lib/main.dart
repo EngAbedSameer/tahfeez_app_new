@@ -1,36 +1,40 @@
-import 'dart:async';
-// import 'dart:js';
-
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
+import 'package:quickalert/models/quickalert_options.dart';
 import 'package:quickalert/quickalert.dart';
+import 'package:quickalert/widgets/quickalert_buttons.dart';
+import 'package:quickalert/widgets/quickalert_container.dart';
 import 'package:tahfeez_app/Login.dart';
 import 'package:tahfeez_app/daeily.dart';
 import 'package:tahfeez_app/firebase_options.dart';
 import 'package:tahfeez_app/sqfDB.dart';
 import 'Home.dart';
-// ضيف الية تسجيل مراجعة او سرد مجموعة من السور 
+
+// ضيف الية تسجيل مراجعة او سرد مجموعة من السور
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-
-    runApp(MyHome());
-  
-} 
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
+  runApp(MyHome());
+}
 
 class MyHome extends StatelessWidget {
-  MyHome({super.key}); 
- 
-  final SqlDb db = SqlDb();
+  MyHome({super.key});
+
+  // final SqlDb db = SqlDb();
 
   @override
   Widget build(BuildContext context) {
     dynamic _nextScreen = "";
-_nextScreen = Login();
-    return MaterialApp( 
+    _nextScreen = Login();
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Tahfeez',
       theme: ThemeData(
@@ -49,8 +53,6 @@ _nextScreen = Login();
       //   'daily': (context) => Da(),
       // },
     );
-  
-  
   }
 }
 

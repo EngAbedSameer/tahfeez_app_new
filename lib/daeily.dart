@@ -36,7 +36,7 @@ class DaPage extends StatefulWidget {
 
 class _DaPageState extends State<DaPage> {
   // var _localData = data.daily;
-  SqlDb db = SqlDb();
+  // SqlDb db = SqlDb();
   // Future<List<Map<dynamic, dynamic>>> _getStd() async {
   //   List<Map> localData = await db.readData("SELECT * FROM students");
   //   return localData;
@@ -45,13 +45,18 @@ class _DaPageState extends State<DaPage> {
   List<Map> _dataToBeInserted = [];
   bool isOnce = false;
 
-  Future<List<Map>> _getStd() async {
-    List<Map> result = await db.readData(
-        "SELECT id, f_name, m_name, l_name , attendance ,points FROM students");
-    if (!isOnce) _dataToBeInserted = _getdata(List.from(result));
-    isOnce = true;
-    return _dataToBeInserted;
+
+  _getStd() async{
+    
   }
+
+  // Future<List<Map>> _getStd() async {
+  //   List<Map> result = await db.readData(
+  //       "SELECT id, f_name, m_name, l_name , attendance ,points FROM students");
+  //   if (!isOnce) _dataToBeInserted = _getdata(List.from(result));
+  //   isOnce = true;
+  //   return _dataToBeInserted;
+  // }
 
   _getdata(List<Map> data) {
     // [
@@ -71,18 +76,18 @@ class _DaPageState extends State<DaPage> {
     }).toList(growable: false);
   }
 
-  _save() {
-    _dataToBeInserted.forEach((element) {
-      if (element['isAttended'].toString() == "true") {
-        db.insertData(
-            "INSERT INTO 'Attendance' (std_id, name, date) VALUES ( '${element['id']}' , '${element['f_name'] + "  " + element['l_name']}' ,'${element['date']}')");
-        // element['isAttended'] = (element['isAttended']) ? 1 : 0;
-        // var attend = element['isAttended'] + element['attendance'];
-        db.updateData(
-            "UPDATE 'Students'  SET attendance= ${1 + element['attendance']}  WHERE id=${element['id']}");
-      }
-    });
-  }
+  // _save() {
+  //   _dataToBeInserted.forEach((element) {
+  //     if (element['isAttended'].toString() == "true") {
+  //       db.insertData(
+  //           "INSERT INTO 'Attendance' (std_id, name, date) VALUES ( '${element['id']}' , '${element['f_name'] + "  " + element['l_name']}' ,'${element['date']}')");
+  //       // element['isAttended'] = (element['isAttended']) ? 1 : 0;
+  //       // var attend = element['isAttended'] + element['attendance'];
+  //       db.updateData(
+  //           "UPDATE 'Students'  SET attendance= ${1 + element['attendance']}  WHERE id=${element['id']}");
+  //     }
+  //   });
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -135,7 +140,7 @@ class _DaPageState extends State<DaPage> {
                     children: [
                       ElevatedButton(
                           onPressed: () {
-                            _save();
+                            // _save();
                             Navigator.of(context)
                                 .popUntil((route) => route.isFirst);
                           },

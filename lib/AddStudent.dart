@@ -46,7 +46,7 @@ class _AddStudentState extends State<AddStudent>
       _levelController = TextEditingController(),
       _lastTestController = TextEditingController(),
       _lastTestDegreeController = TextEditingController();
-  SqlDb db = SqlDb();
+  // SqlDb db = SqlDb();
   late TextStyle cardTextStyle =
       TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, height: 2.5);
   late TextStyle cardMainTextStyle = TextStyle(
@@ -55,17 +55,18 @@ class _AddStudentState extends State<AddStudent>
       height: 2.5,
       color: Colors.green);
 
-  Future<List<Map>> _getStudentDate() async {
-    List<Map> result = await db.readData("SELECT * FROM students WHERE id=");
-    return result;
-  }
+  // Future<List<Map>> _getStudentDate() async {
+  //   List<Map> result = await db.readData("SELECT * FROM students WHERE id=");
+  //   return result;
+  // }
 
-  _addStudent(fname, mname, lname, phone, dob, idn, school, level, lastTest,
-      lastTestDegree) async {
+  _addStudent(mEmail, fname, mname, lname, phone, dob, idn, school, level,
+      lastTest, lastTestDegree) async {
     try {
       DateTime now = DateTime.now();
       String date = intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-      std = new Student(
+      std =  Student(
+          memorizerEmail: widget.memorizerEmail,
           fname: fname,
           mname: mname,
           lname: lname,
@@ -74,13 +75,14 @@ class _AddStudentState extends State<AddStudent>
           phone: phone,
           school: school,
           level: level,
-          score: "0",
+          // score: "0",
           attendance: "0",
-          commitment: "0",
+          // commitment: "0",
           points: "0",
           lastTest: lastTest,
           lastTestDegree: lastTestDegree,
-          last_update: date);
+          last_update: date,
+          isDeleted:"false");
       std.addStudent();
       // String date =
       //     '${now.year}-${now.month}-${now.day} ${now.hour}:${now.minute}:${now.second}';
@@ -104,14 +106,14 @@ class _AddStudentState extends State<AddStudent>
     }
   }
 
-  Future<List<Map>> _getStudentHistory(id) async {
-    List<Map> result =
-        await db.readData("SELECT * FROM Records WHERE std_id='id' ");
-    // print(result[0]["date"].split(" ")[0]);
-    // print(" ******************** ");
-    // print(DateTime.now().toString().split(" ")[0]);
-    return result;
-  }
+  // Future<List<Map>> _getStudentHistory(id) async {
+  //   List<Map> result =
+  //       await db.readData("SELECT * FROM Records WHERE std_id='id' ");
+  //   // print(result[0]["date"].split(" ")[0]);
+  //   // print(" ******************** ");
+  //   // print(DateTime.now().toString().split(" ")[0]);
+  //   return result;
+  // }
 
   // Future<List<Map>> _getStudentTests() async {
   //   List<Map> result = await db
@@ -119,13 +121,16 @@ class _AddStudentState extends State<AddStudent>
   //   return result;
   // }
   _dateValidator(date) {
+    bool result =true;
     List<String> dateValid = date.toString().split("-");
-    if (dateValid.length < 4) {
-      if (dateValid[0].length == 2) return false;
-      if (dateValid[1].length == 2) return false;
-      if (dateValid[2].length == 4) return false;
+    if (dateValid.length==3) {
+      if (dateValid[0].length == 2)  result=false;
+      if (dateValid[1].length == 2)  result=false;
+      if (dateValid[2].length == 4)  result=false;
+    }else{
+       result=false;
     }
-    return true;
+    return result;
     // print(dateValid);
     // print("*********************");
   }
@@ -149,7 +154,7 @@ class _AddStudentState extends State<AddStudent>
         Directionality(
           textDirection: TextDirection.rtl,
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Center(
               child: SingleChildScrollView(
                 child: Form(
@@ -157,6 +162,9 @@ class _AddStudentState extends State<AddStudent>
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
+                      SizedBox(
+                        height: 20,
+                      ),
                       CircleAvatar(
                         radius: 50,
                         backgroundImage: AssetImage("assets/images/splash.jpg"),
@@ -165,6 +173,7 @@ class _AddStudentState extends State<AddStudent>
                         height: 20,
                       ),
                       TextFormField(
+                        textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -189,6 +198,7 @@ class _AddStudentState extends State<AddStudent>
                         height: _space,
                       ),
                       TextFormField(
+                        textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -212,6 +222,7 @@ class _AddStudentState extends State<AddStudent>
                         height: _space,
                       ),
                       TextFormField(
+                        textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -235,6 +246,8 @@ class _AddStudentState extends State<AddStudent>
                         height: _space,
                       ),
                       TextFormField(
+                        keyboardType: TextInputType.phone,
+                        textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -266,9 +279,11 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
                                 validator: (value) {
-                                  if (value == null || _dateValidator(value)) {
-                                    return "يجب ملئ هذا الحقل  او تعديل صيغة التاريخ";
+                                  if (_dateValidator(value)) {
+                                    return "يجب ملئ هذا الحقل او تعديل صيغة التاريخ";
                                   } else
                                     return null;
                                 },
@@ -296,6 +311,8 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   // print(value!.length);
                                   if (value == null || value.length == 0)
@@ -333,6 +350,7 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -362,6 +380,7 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -396,6 +415,8 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
+                              textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -425,6 +446,7 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -459,6 +481,7 @@ class _AddStudentState extends State<AddStudent>
                           // print(" 0000000000000000000 ");
                           if (_formKey.currentState!.validate()) {
                             _addStudent(
+                                widget.memorizerEmail,
                                 _fnameController.text.toString(),
                                 _mnameController.text.toString(),
                                 _lnameController.text.toString(),

@@ -12,7 +12,7 @@ class Record {
   int? quality, pgsCount, commitment;
 
   Student? std;
-  SqlDb db = SqlDb();
+  // SqlDb db = SqlDb();
   Firestore myFierstor = Firestore();
 
 // Record(Student? std){
@@ -37,8 +37,8 @@ class Record {
       double quality, double pgsCount, double commitment, double type) async {
     try {
       // add record to local database
-      String localRecordID = await db.addRecord(
-          stdID, surah, from, to, quality, pgsCount, commitment, type);
+      // String localRecordID = await db.addRecord(
+      //     stdID, surah, from, to, quality, pgsCount, commitment, type);
       // add record to cloud database
       String cloudRecordID = await myFierstor
           .addRecord(idn: stdID.toString(), mEmail: email, data: {
@@ -52,7 +52,7 @@ class Record {
         'isSynced': 'false'
       });
       // update record id field in local database
-      await db.updateRecordID(localRecordID, cloudRecordID);
+      // await db.updateRecordID(localRecordID, cloudRecordID);
       // update lastUpdate field in student cloud doc.
       myFierstor.setStudentLastUpdate(mEmail: email, idn: stdID.toString());
     } catch (e) {
