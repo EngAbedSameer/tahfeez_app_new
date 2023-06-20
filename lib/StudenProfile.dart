@@ -1,4 +1,5 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables, implementation_imports, curly_braces_in_flow_control_structures, unused_element
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:age_calculator/age_calculator.dart';
 import 'package:flutter/material.dart';
@@ -20,7 +21,8 @@ class StudentProfile extends StatefulWidget {
 
   const StudentProfile({
     super.key,
-    required this.studentIDn, required this.memorizerEmail,
+    required this.studentIDn,
+    required this.memorizerEmail,
   });
   @override
   State<StudentProfile> createState() => _StudentProfileState();
@@ -51,9 +53,11 @@ class _StudentProfileState extends State<StudentProfile>
       height: 2.5,
       color: Colors.green);
 
-_getStudentDate() async{
- return await myFierstor.getStudentData(mEmail: widget.memorizerEmail, idn: widget.studentIDn);
-}
+  Future<List<Map<dynamic, dynamic>>> _getStudentDate() async {
+    var r = await myFierstor.getStudentData(
+        mEmail: widget.memorizerEmail, idn: widget.studentIDn);
+    return List.generate(1, (index) => r);
+  }
 
   // Future<List<Map>> _getStudentDate() async {
   //   List<Map> result = await db
@@ -61,11 +65,12 @@ _getStudentDate() async{
   //   return result;
   // }
 
-
-_getStudentHistory()async{
-  await myFierstor.getRecordDocs(mEmail: widget.memorizerEmail, idn: widget.studentIDn);
-
-}
+  Future<List<QueryDocumentSnapshot<Object?>>> _getStudentHistory() async {
+    var r = await myFierstor.getRecordDocs(
+        mEmail: widget.memorizerEmail, idn: widget.studentIDn);
+    var result = List.generate(r.length, (index) => r.asMap());
+    return r;
+  }
 
   // Future<List<Map>> _getStudentHistory() async {
   //   List<Map> result = await db
@@ -75,21 +80,30 @@ _getStudentHistory()async{
   //   print(DateTime.now().toString().split(" ")[0]);
   //   return result;
   // }
-
   // Future<List<Map>> _getStudentTests() async {
   //   List<Map> result = await db
   //       .readData("SELECT * FROM tests WHERE id=${widget.studentSysID}");
   //   return result;
   // }
 
- _ageCalc(String birthday){ 
-  print(birthday); 
+  _ageCalc(String birthday) {
+    print(birthday);
 
-  List<String>date=birthday.split("-");
-  String newDate=date[2]+"-"+date[1]+"-"+date[0];
-  DateDuration duration = AgeCalculator.age(DateTime.parse(newDate));
-  return duration.years.toString();
-}
+    List<String> date = birthday.split("-");
+    String newDate = date[2] + "-" + date[1] + "-" + date[0];
+    DateDuration duration = AgeCalculator.age(DateTime.parse(newDate));
+    return duration.years.toString();
+  }
+
+  String getRecordDate(date) {
+    if (date.runtimeType.toString() == "Timestamp") {
+      var s = date as Timestamp;
+      print(s.toDate().toString());
+      return s.toDate().toString().split(" ")[0];
+    } else {
+      return date.toString().split("T")[0]; 
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,7 +146,7 @@ _getStudentHistory()async{
                       Row(
                         children: [
                           Container(
-                            width: (dviceWidth-20 )* 0.47,
+                            width: (dviceWidth - 20) * 0.47,
                             child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
@@ -184,7 +198,10 @@ _getStudentHistory()async{
                                           height: 2.5),
                                     ),
                                   ),
-                                  Text("العمر: "+_ageCalc(stdDate["DOB"].toString()).toString(),
+                                  Text(
+                                      "العمر: " +
+                                          _ageCalc(stdDate["DOB"].toString())
+                                              .toString(),
                                       style: TextStyle(
                                           fontSize: 14.sp,
                                           fontWeight: FontWeight.bold,
@@ -207,14 +224,19 @@ _getStudentHistory()async{
                               fontSize: 27, fontWeight: FontWeight.bold)),
                       FutureBuilder(
                           future: _getStudentHistory(),
-                          builder:
-                              ((context, AsyncSnapshot<List<Map>> snapshot) {
+                          builder: ((context,
+                              AsyncSnapshot<
+                                      List<QueryDocumentSnapshot<Object?>>>
+                                  snapshot) {
                             if (snapshot.hasData && snapshot.data!.length > 0) {
                               return Flexible(
                                 child: ListView.builder(
                                     itemCount: snapshot.data?.length,
                                     itemBuilder: (context, index) {
-                                      var recordData = snapshot.data![index];
+                                      var recordData =
+                                          snapshot.data![index].data() as Map;
+                                      print("data");
+                                      print(recordData);
                                       return Card(
                                         margin: EdgeInsets.all(6),
                                         child: Stack(
@@ -260,11 +282,9 @@ _getStudentHistory()async{
                                                                 style:
                                                                     cardMainTextStyle),
                                                             Text(
-                                                                recordData[
-                                                                        'date']
-                                                                    .toString()
-                                                                    .split(
-                                                                        " ")[0],
+                                                                getRecordDate(
+                                                                    recordData[
+                                                                        'date']),
                                                                 style:
                                                                     cardTextStyle),
                                                           ],
@@ -325,7 +345,7 @@ _getStudentHistory()async{
                                                             Text(
                                                                 maxLines: 1,
                                                                 recordData[
-                                                                        'frm']
+                                                                        'from']
                                                                     .toString(),
                                                                 style:
                                                                     cardTextStyle),
@@ -338,7 +358,7 @@ _getStudentHistory()async{
                                                                 style:
                                                                     cardMainTextStyle),
                                                             Text(
-                                                                recordData['t']
+                                                                recordData['to']
                                                                     .toString(),
                                                                 style:
                                                                     cardTextStyle),
@@ -352,7 +372,7 @@ _getStudentHistory()async{
                                                                     cardMainTextStyle),
                                                             Text(
                                                                 recordData[
-                                                                        'pgs_count']
+                                                                        'pgsCount']
                                                                     .toString(),
                                                                 style:
                                                                     cardTextStyle),
@@ -368,10 +388,8 @@ _getStudentHistory()async{
                                           ],
                                         ),
                                       );
-
                                     }),
                               );
-
                             } else
                               return Center(child: CircularProgressIndicator());
                           }))
@@ -384,11 +402,11 @@ _getStudentHistory()async{
             }
           })),
       bottomNavigationBar: BottomBar(
-        dailyReplace: true,
-        dailyPush: false,
-        home: true,
-        addStudent: true,memorizerEmail: widget.memorizerEmail
-      ),
+          dailyReplace: true,
+          dailyPush: false,
+          home: true,
+          addStudent: true,
+          memorizerEmail: widget.memorizerEmail),
     );
   }
 }

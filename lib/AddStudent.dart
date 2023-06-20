@@ -257,7 +257,7 @@ class _AddStudentState extends State<AddStudent>
                               return null;
                           },
                           decoration: InputDecoration(
-                              hintText: "+970592654021",
+                              hintText: "يجب كتابته مع مقدمة الدولة(+970)",
                               enabledBorder: OutlineInputBorder(
                                   borderSide: BorderSide(color: Colors.green)),
                               focusedBorder: OutlineInputBorder(

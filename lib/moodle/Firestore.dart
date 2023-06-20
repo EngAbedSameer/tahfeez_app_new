@@ -1,5 +1,6 @@
 // import 'dart:js_interop';
 // import 'dart:js_util';
+import 'dart:async';
 import 'dart:io';
 import 'dart:math';
 
@@ -72,8 +73,7 @@ class Firestore {
     // var r = await students.get();
     var temp = await students
         .where("IDn",
-            isEqualTo:
-                idn!.runtimeType == int ? idn!.parse(idn!) : idn!.toString())
+            isEqualTo:idn!.toString())
         .get();
     var stdDoc = students.doc(temp.docs.first.id);
     return stdDoc;
@@ -150,7 +150,7 @@ class Firestore {
     var redords = await getRecordsCollection(mEmail: mEmail, idn: idn);
     var r = await redords.get();
     // var temp = await redords.where("IDn", isEqualTo: idn!).get();
-    // print(" 000000000000000000  ${r.docs.first.data()}   $idn");
+    print(" 000000000000000000  ${r.docs.first.data()}   $idn");
     // var recordDoc = redords.doc(temp.docs.first.id);
     return r.docs;
   }
@@ -180,7 +180,13 @@ class Firestore {
   }
 
   addRecord({Map<String, dynamic>? data, idn, mEmail}) async {
-        final records = await getRecordsCollection(idn: idn, mEmail: mEmail);
+    print('''try to add record of 
+      $data
+      for $idn
+      in memorizer $mEmail
+      with data : 
+      $data''');
+    final records = await getRecordsCollection(idn: idn, mEmail: mEmail);
     DateTime now = DateTime.now();
     // DateTime date =  intl.DateFormat('yyyy-MM-dd HH:mm:ss').parse(now.toString(),false);
     // print(now);
@@ -189,7 +195,30 @@ class Firestore {
     the prob is date appear in firebase more than local on 3 hours
     */
     data?.addEntries({"date": now}.entries);
-    records.add(data);
+    try {
+      records.add(data).then((record) {
+        print("Added Record with ID: ${record.id}");
+      });
+    } catch (e) {
+      print('''Error
+      
+      $e
+      ''');
+    }
+  }
+
+  addOldRecord({Map<String, dynamic>? data, idn, mEmail}) async {
+    print('''try to add record of 
+      $data
+      for $idn
+      in memorizer $mEmail
+      with data : 
+      $data''');
+    final records = await getRecordsCollection(idn: idn, mEmail: mEmail);
+      records.add(data).then((record) {
+        print("Added Record with ID: ${record.id}"); 
+      });
+   
   }
 
   deleteStudent(mEmail, stdIDn) async {

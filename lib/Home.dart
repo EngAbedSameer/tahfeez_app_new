@@ -13,12 +13,15 @@ import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/models/quickalert_options.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:quickalert/widgets/quickalert_container.dart';
+import 'package:sentry_flutter/sentry_flutter.dart';
+import 'package:tahfeez_app/ContactUs.dart';
 import 'package:tahfeez_app/Login.dart';
 import 'package:tahfeez_app/NewRecord.dart';
 import 'package:tahfeez_app/StudenProfile.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/MenuItem.dart';
 import 'package:tahfeez_app/moodle/MenuItems.dart';
+import 'package:tahfeez_app/moodle/bug-report-overlay.dart';
 import 'package:tahfeez_app/moodle/student.dart';
 import 'package:tahfeez_app/services/MapStyle.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -275,7 +278,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
-              .value = (list[row]['type'].toString()=='1')?"مراجعة": "حفظ";
+              .value = (list[row]['type'].toString() == '1') ? "مراجعة" : "حفظ";
         }
         print(" ============ ON Export ===========");
         // print(list[row]);
@@ -328,8 +331,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("تم التصدير بنجاح")));
       return false;
-    } catch (e) {
-      print(e);
+    } catch (exception, stackTrace) {
+      print(exception);
+      await Sentry.captureException(
+        exception,
+        stackTrace: stackTrace,
+      );
       return false;
     }
   }
@@ -357,14 +364,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     var bytes = File(filePath).readAsBytesSync();
     print(filePath);
     var excel = Excel.decodeBytes(bytes);
+    print(excel.tables.keys);
     for (var table in excel.tables.keys) {
       if (table.characters.toString() == "data") {
         print(" ================= Data ================= ");
         List<Map<String, dynamic>> temp = [];
         for (var row in excel.tables[table]!.rows) {
-          print(' 33333333333333333 ');
+          // print(' 33333333333333333 ');
           // print(data[0]['last_update']);
-          print(row);
+          // print(row);
           // print("\n");
           temp.add({
             'f_name': row[0]!.value.toString().trim(),
@@ -380,6 +388,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             'lastTest': row[10]!.value.toString().trim(),
             'lastTestDegree': row[11]!.value.toString().trim(),
             'last_update': row[12]!.value.toString().trim(),
+            'isDeleted': 'false',
           });
         }
         temp.removeAt(0);
@@ -405,34 +414,36 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       //     print('${row[2]!.value}');
       //   }
       //   temp.removeAt(0);
-
       //   fileData.add(temp);
       //   // print(" ============== Atte =============");
       //   // print(fileData);
-      // } else if (table.characters.toString() == "records") {
-      //   print(" ================= records ================= ");
-      //   List<Map<String, dynamic>> temp = [];
-
-      //   for (var row in excel.tables[table]!.rows) {
-      //     // print(row[0]!.value);
-      //     // print("\n");
-      //     temp.add({
-      //       'std-id': row[1]!.value,
-      //       'sourah': row[2]!.value,
-      //       'date': row[3]!.value,
-      //       'from': row[4]!.value,
-      //       'to': row[5]!.value,
-      //       'quality': row[6]!.value,
-      //       'pages-count': row[7]!.value,
-      //       'commitment': row[8]!.value,
-      //       'type': row[9]!.value
-      //     });
-      //   }
-      //   temp.removeAt(0);
-      //   fileData.add(temp);
-      //   // print(" ============== Records =============");
-      //   // print(fileData);
       // }
+      else if (table.characters.toString() == "records") {
+        print(" ================= records ================= ");
+        List<Map<String, dynamic>> temp = [];
+
+        for (var row in excel.tables[table]!.rows) {
+          // print(row[0]!.value);
+          // print("\n");
+
+          temp.add({
+            'surah': row[0]!.value,
+            'from': row[1]!.value,
+            'to': row[2]!.value,
+            'date': row[3]!.value,
+            'quality': row[4]!.value,
+            'pgsCount': row[5]!.value,
+            'commitment': row[6]!.value,
+            'IDn': row[7]!.value,
+            'type': row[8]!.value,
+            'isSynced': "false"
+          });
+        }
+        temp.removeAt(0);
+        fileData.add(temp);
+        // print(" ============== Records =============");
+        // print(fileData);
+      }
     }
     return fileData;
   }
@@ -901,10 +912,20 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //     }
 //   }
 
-  _uploadeDataToFirestore(List<Map<String, dynamic>> data) {
+  Future _uploadeStdDataToFirestore(List<Map<String, dynamic>> data) async {
     for (int i = 0; i < data.length; i++) {
       data[i].addEntries({'m-email': memorizerEmail}.entries);
-      myFierstor.addStudent(data: data[i], mEmail: memorizerEmail);
+      await myFierstor.addStudent(data: data[i], mEmail: memorizerEmail);
+    }
+  }
+
+  _uploadeRecordaDataToFirestore(List<Map<String, dynamic>> data) async {
+    print('Record');
+    // print(data);
+    for (int i = 0; i < data.length; i++) {
+      data[i].addEntries({'m-email': memorizerEmail}.entries);
+      await myFierstor.addOldRecord(
+          data: data[i], mEmail: memorizerEmail, idn: data[i]['IDn']);
     }
   }
 
@@ -956,13 +977,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       //       title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
       // }
     } else if (item == MenuItems.itemImport) {
+      FilePicker.platform.clearTemporaryFiles();
       final result = await FilePicker.platform.pickFiles();
       if (result == null) return;
       final file = result.files.first;
       List<List<Map<String, dynamic>>> data =
           await _exportFromExcelAsListOfMaps(file.path);
-      // print(data);
-      _uploadeDataToFirestore(await data[0]);
+
+      print(data[1]);
+      await _uploadeStdDataToFirestore(await data[0]).then((value) {
+        _uploadeRecordaDataToFirestore(data[1]);
+      });
+
       // _importDateToLocalDB(await data);
       // _get1(data);
     } else if (item == MenuItems.itemExport) {
@@ -1006,6 +1032,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     } else if (item == MenuItems.itemLogout) {
       logout();
     }
+    // else if (item == MenuItems.itemContactUs) {
+    //   // BugReportOverlay(mEmail: memorizerEmail);
+    //   Navigator.of(context).push(MaterialPageRoute(
+    //       builder: (context) => ContactUs(userEmail: memorizerEmail)));
+    // }
   }
 
   logout() async {
@@ -1035,12 +1066,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         print("enable network");
         myFierstor.ref.enableNetwork();
       }
-    } on SocketException catch (e) {
+    } catch (exception) {
       myFierstor.ref.disableNetwork();
-      print("disable network");
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("لا يوجد إتصال بالانترنت")));
-      print(e.osError);
       // QuickAlert.show(
       //     context: context,
       //     type: QuickAlertType.error,

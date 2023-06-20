@@ -9,9 +9,11 @@ import 'package:quickalert/widgets/quickalert_container.dart';
 import 'package:tahfeez_app/Login.dart';
 import 'package:tahfeez_app/daeily.dart';
 import 'package:tahfeez_app/firebase_options.dart';
+import 'package:tahfeez_app/moodle/SenrtyReports.dart';
+import 'package:tahfeez_app/moodle/bug-report-overlay.dart';
 import 'package:tahfeez_app/sqfDB.dart';
 import 'Home.dart';
-
+import 'package:sentry_flutter/sentry_flutter.dart';
 // ضيف الية تسجيل مراجعة او سرد مجموعة من السور
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -22,7 +24,8 @@ main() async {
     persistenceEnabled: true,
     cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
   );
-  runApp(MyHome());
+    await SentryReporter.setup(MyHome());
+  // runApp(MyHome());
 }
 
 class MyHome extends StatelessWidget {
@@ -32,9 +35,11 @@ class MyHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dynamic _nextScreen = "";
+    dynamic _nextScreen = ""; 
     _nextScreen = Login();
-    return MaterialApp(
+    return 
+    // BugReportOverlay();
+     MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Tahfeez',
       theme: ThemeData(
@@ -53,6 +58,7 @@ class MyHome extends StatelessWidget {
       //   'daily': (context) => Da(),
       // },
     );
+  
   }
 }
 

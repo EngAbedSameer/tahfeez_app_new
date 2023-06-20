@@ -10,7 +10,8 @@ class MenuItems {
     // itemDeletAll,
     // itemUplode,
     itemLogout,
-    itemWhatsapp
+    itemWhatsapp,
+    // itemContactUs
   ];
 
   static const itemSync = MyMenuItem(text: "مزامنة", icon: Icons.sync_outlined);
@@ -18,6 +19,7 @@ class MenuItems {
 
   static const itemExport = MyMenuItem(text: "تصدير", icon: Icons.file_upload);
   static const itemLogout = MyMenuItem(text: "تسجيل خروج", icon: Icons.logout);
+  // static const itemContactUs = MyMenuItem(text: "الأبلاغ عن مشكلة", icon: Icons.bug_report,);
 
   // static const itemDeletData =
   //     MyMenuItem(text: "Delete All Data ", icon: Icons.delete);
