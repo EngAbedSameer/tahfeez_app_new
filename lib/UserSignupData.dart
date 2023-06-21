@@ -40,6 +40,7 @@ class _UserSignupDataState extends State<UserSignupData> {
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("كلمة المرور ضعيفة, يجب ان تكون على الاقل 6 حروف")));
       } else {
+        print(msg);
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(msg)));
       }

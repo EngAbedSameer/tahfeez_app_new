@@ -129,211 +129,273 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     });
   }
 
+  var isLogin = false;
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    FirebaseAuth.instance.authStateChanges().listen((User? user) {
+      print('''
+user is 
+${user}''');
+      if (user == null) { 
+         setState(() {
+           isLogin = false;
+        });
+      } else {
+        setState(() {
+           isLogin = true;
+        });
+       
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
 // _isRemembered();
     var vw = MediaQuery.of(context).size.width;
     var vh = MediaQuery.of(context).size.height;
-    return StreamBuilder(
-      stream: FirebaseAuth.instance.authStateChanges(),
-      builder: (context, snapshots) {
-        return Stack(
-          children: <Widget>[
-            Image.asset(
-              "assets/images/background.jpg",
-              fit: BoxFit.cover,
-              width: vw,
-            ),
-            Scaffold(
-              backgroundColor: Colors.transparent,
-              body: Directionality(
-                textDirection: TextDirection.rtl,
-                child: ListView(
-                  padding: EdgeInsets.only(top: vh * 0.2, bottom: 50),
-                  children: [
-                    Container(
-                      alignment: Alignment.center,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          SizedBox(
-                            height: vh * 0.001,
-                          ),
-                          Image.asset(
-                            "assets/icon/logo.png",
-                            width: 200,
-                          ),
-                          Text(singup ? "إنشاء حساب" : "تسجيل الدخول",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontSize: 32,
-                                  fontFamily: 'Segoe UI',
-                                  fontWeight: FontWeight.bold)),
-                          Form(
-                            key: _formKey,
-                            child: Column(
-                              children: [
-                                Container(
-                                  child: TextFormField(
-                                    textInputAction: TextInputAction.next,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'يجب تعبئة هذه الخانة';
-                                      }
-                                      return null;
-                                    },
-                                    controller: _emailController,
-                                    decoration: InputDecoration(
-                                        border: UnderlineInputBorder(),
-                                        label: Text('أدخل بريدك الإلكتروني'),
-                                        focusColor: Colors.red),
-                                  ),
-                                  width: vw * 0.70,
-                                ),
-                                Container(
-                                  child: TextFormField(
-                                    obscureText: !_showPassword,
-                                    textInputAction: singup
-                                        ? TextInputAction.next
-                                        : TextInputAction.done,
-                                    controller: _passwordController,
-                                    validator: (value) {
-                                      if (value == null || value.isEmpty) {
-                                        return 'يجب تعبئة هذه الخانة';
-                                      }
-                                      return null;
-                                    },
-                                    decoration: InputDecoration(
-                                        suffixIcon: GestureDetector(
-                                          onTap: () {
-                                            _togglePassvisibility('password');
-                                          },
-                                          child: Icon(
-                                            !_showPassword
-                                                ? Icons.visibility
-                                                : Icons.visibility_off,
-                                          ),
-                                        ),
-                                        border: UnderlineInputBorder(),
-                                        label: Text('أدخل كملة المرور'),
-                                        focusColor: Colors.red),
-                                  ),
-                                  width: vw * 0.70,
-                                ),
-                                singup
-                                    ? Container(
-                                        child: TextFormField(
-                                          obscureText: !_showRePassword,
-                                          decoration: InputDecoration(
-                                              suffixIcon: GestureDetector(
-                                                onTap: () {
-                                                  _togglePassvisibility(
-                                                      'rePassword');
-                                                },
-                                                child: Icon(
-                                                  !_showRePassword
-                                                      ? Icons.visibility
-                                                      : Icons.visibility_off,
-                                                ),
-                                              ),
-                                              border: UnderlineInputBorder(),
-                                              label: Text(' إعادة كلمة المرور'),
-                                              focusColor: Colors.red),
-                                          controller: _repasswordController,
-                                          validator: (value) {
-                                            if (value == null ||
-                                                value.isEmpty) {
-                                              return 'يجب تعبئة هذه الخانة';
-                                            } else if (value.toString() !=
-                                                _repasswordController.text
-                                                    .toString()) {
-                                              return 'كلمة السر غير متطابقة';
-                                            }
-                                            return null;
-                                          },
-                                        ),
-                                        width: vw * 0.70,
-                                      )
-                                    : SizedBox(),
-                              ],
-                            ),
-                          ),
-                          ElevatedButton(
-                              onPressed: () async {
-                                if (_formKey.currentState!.validate()) {
-                                  singup
-                                      ? {
-                                          // _signUp(
-                                          //     _emailController.text.trim(),
-                                          //     _passwordController.text.trim())
-                                          Navigator.pushAndRemoveUntil(
-                                            context,
-                                            MaterialPageRoute(
-                                                builder: (context) {
-                                              return UserSignupData(
-                                                  memorizerEmail:
-                                                      _emailController.text
-                                                          .toString(),
-                                                  password: _passwordController
-                                                      .text
-                                                      .toString());
-                                            }),
-                                            (route) => false,
-                                          )
-                                        }
-                                      : {
-                                          await _auth(
-                                                  _emailController.text.trim(),
-                                                  _passwordController.text
-                                                      .trim())
-                                              ?  Navigator.pushReplacement(
-                                                  context, MaterialPageRoute(
-                                                      builder: (context) {
-                                                  return FirebaseAuth.instance.currentUser!.emailVerified?Home():EmailVerification(memorizerEmail: _emailController.text.toString(), signUp: false);
-                                                }))
-                                              : print("Error")
-                                        };
-                                }
-                              },
-                              child: Text(singup ? "التالي" : "تسجيل الدخول ")),
-                          SizedBox(
-                            height: 20,
-                          ),
-                          RichText(
-                            text: TextSpan(
-                                text: singup
-                                    ? ' لديك حساب ؟ '
-                                    : '  ليس لديك حساب ؟',
-                                style: TextStyle(
-                                    fontSize: 20, color: Colors.black),
-                                children: [
-                                  TextSpan(
-                                      recognizer: TapGestureRecognizer()
-                                        ..onTap = () {
-                                          setState(() {
-                                            singup = !singup;
-                                          });
-                                        },
-                                      text: singup
-                                          ? ' تسجيل الدخول'
-                                          : ' أنشأ حساب',
-                                      style: TextStyle(
-                                          decoration: TextDecoration.underline,
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary))
-                                ]),
-                          )
-                        ],
-                      ),
-                    )
-                  ],
+
+    if (!isLogin) {
+      return StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshots) {
+            // if (snapshots.hasData && !snapshots.data!.emailVerified) {
+            //   print('Email not ver ${snapshots.data!.email}');
+            //   return EmailVerification(
+            //     memorizerEmail: snapshots.data!.email.toString(),
+            //     signUp: singup,
+            //   );
+            // } else {
+            return Stack(
+              children: <Widget>[
+                Image.asset(
+                  "assets/images/background.jpg",
+                  fit: BoxFit.cover,
+                  width: vw,
                 ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
+                Scaffold(
+                  backgroundColor: Colors.transparent,
+                  body: Directionality(
+                    textDirection: TextDirection.rtl,
+                    child: ListView(
+                      padding: EdgeInsets.only(top: vh * 0.2, bottom: 50),
+                      children: [
+                        Container(
+                          alignment: Alignment.center,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                height: vh * 0.001,
+                              ),
+                              Image.asset(
+                                "assets/icon/logo.png",
+                                width: 200,
+                              ),
+                              Text(singup ? "إنشاء حساب" : "تسجيل الدخول",
+                                  style: TextStyle(
+                                      color: Colors.black,
+                                      fontSize: 32,
+                                      fontFamily: 'Segoe UI',
+                                      fontWeight: FontWeight.bold)),
+                              Form(
+                                key: _formKey,
+                                child: Column(
+                                  children: [
+                                    Container(
+                                      child: TextFormField(
+                                        textInputAction: TextInputAction.next,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'يجب تعبئة هذه الخانة';
+                                          }
+                                          return null;
+                                        },
+                                        controller: _emailController,
+                                        decoration: InputDecoration(
+                                            border: UnderlineInputBorder(),
+                                            label:
+                                                Text('أدخل بريدك الإلكتروني'),
+                                            focusColor: Colors.red),
+                                      ),
+                                      width: vw * 0.70,
+                                    ),
+                                    Container(
+                                      child: TextFormField(
+                                        obscureText: !_showPassword,
+                                        textInputAction: singup
+                                            ? TextInputAction.next
+                                            : TextInputAction.done,
+                                        controller: _passwordController,
+                                        validator: (value) {
+                                          if (value == null || value.isEmpty) {
+                                            return 'يجب تعبئة هذه الخانة';
+                                          }
+                                          return null;
+                                        },
+                                        decoration: InputDecoration(
+                                            suffixIcon: GestureDetector(
+                                              onTap: () {
+                                                _togglePassvisibility(
+                                                    'password');
+                                              },
+                                              child: Icon(
+                                                !_showPassword
+                                                    ? Icons.visibility
+                                                    : Icons.visibility_off,
+                                              ),
+                                            ),
+                                            border: UnderlineInputBorder(),
+                                            label: Text('أدخل كملة المرور'),
+                                            focusColor: Colors.red),
+                                      ),
+                                      width: vw * 0.70,
+                                    ),
+                                    singup
+                                        ? Container(
+                                            child: TextFormField(
+                                              obscureText: !_showRePassword,
+                                              decoration: InputDecoration(
+                                                  suffixIcon: GestureDetector(
+                                                    onTap: () {
+                                                      _togglePassvisibility(
+                                                          'rePassword');
+                                                    },
+                                                    child: Icon(
+                                                      !_showRePassword
+                                                          ? Icons.visibility
+                                                          : Icons
+                                                              .visibility_off,
+                                                    ),
+                                                  ),
+                                                  border:
+                                                      UnderlineInputBorder(),
+                                                  label: Text(
+                                                      ' إعادة كلمة المرور'),
+                                                  focusColor: Colors.red),
+                                              controller: _repasswordController,
+                                              validator: (value) {
+                                                if (value == null ||
+                                                    value.isEmpty) {
+                                                  return 'يجب تعبئة هذه الخانة';
+                                                } else if (value.toString() !=
+                                                    _repasswordController.text
+                                                        .toString()) {
+                                                  return 'كلمة السر غير متطابقة';
+                                                }
+                                                return null;
+                                              },
+                                            ),
+                                            width: vw * 0.70,
+                                          )
+                                        : SizedBox(),
+                                  ],
+                                ),
+                              ),
+                              ElevatedButton(
+                                  onPressed: () async {
+                                    if (_formKey.currentState!.validate()) {
+                                      singup
+                                          ? {
+                                              // _signUp(
+                                              //     _emailController.text.trim(),
+                                              //     _passwordController.text.trim())
+                                              Navigator.pushAndRemoveUntil(
+                                                context,
+                                                MaterialPageRoute(
+                                                    builder: (context) {
+                                                  return UserSignupData(
+                                                      memorizerEmail:
+                                                          _emailController.text
+                                                              .toString(),
+                                                      password:
+                                                          _passwordController
+                                                              .text
+                                                              .toString());
+                                                }),
+                                                (route) => false,
+                                              )
+                                            }
+                                          : {
+                                              await _auth(
+                                                      _emailController.text
+                                                          .trim(),
+                                                      _passwordController.text
+                                                          .trim())
+                                                  ? Navigator.pushReplacement(
+                                                      context,
+                                                      MaterialPageRoute(
+                                                          builder: (context) {
+                                                      return FirebaseAuth
+                                                              .instance
+                                                              .currentUser!
+                                                              .emailVerified
+                                                          ? Home()
+                                                          : EmailVerification(
+                                                              memorizerEmail:
+                                                                  _emailController
+                                                                      .text
+                                                                      .toString(),
+                                                              signUp: false);
+                                                    }))
+                                                  : print("Error")
+                                            };
+                                    }
+                                  },
+                                  child: Text(
+                                      singup ? "التالي" : "تسجيل الدخول ")),
+                              SizedBox(
+                                height: 20,
+                              ),
+                              RichText(
+                                text: TextSpan(
+                                    text: singup
+                                        ? ' لديك حساب ؟ '
+                                        : '  ليس لديك حساب ؟',
+                                    style: TextStyle(
+                                        fontSize: 20, color: Colors.black),
+                                    children: [
+                                      TextSpan(
+                                          recognizer: TapGestureRecognizer()
+                                            ..onTap = () {
+                                              setState(() {
+                                                singup = !singup;
+                                              });
+                                            },
+                                          text: singup
+                                              ? ' تسجيل الدخول'
+                                              : ' أنشأ حساب',
+                                          style: TextStyle(
+                                              decoration:
+                                                  TextDecoration.underline,
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary))
+                                    ]),
+                              )
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            );
+            // }
+          });
+    } else {
+      return StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshots) {
+            return snapshots.hasData?
+             EmailVerification(
+              memorizerEmail: snapshots.data!.email.toString(),
+              signUp: singup,
+            ):  Text("sd");
+          });
+    }
   }
 }

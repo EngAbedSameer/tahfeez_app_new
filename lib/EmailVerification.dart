@@ -22,6 +22,7 @@ class _EmailVerificationState extends State<EmailVerification> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    print(widget.memorizerEmail);
     isEmailVerified = FirebaseAuth.instance.currentUser!.emailVerified;
     if (!isEmailVerified) {
       sendEmailVerification();
@@ -32,7 +33,6 @@ class _EmailVerificationState extends State<EmailVerification> {
   @override
   void dispose() {
     timer?.cancel();
-
     super.dispose();
   }
 
@@ -49,11 +49,15 @@ class _EmailVerificationState extends State<EmailVerification> {
       var user = FirebaseAuth.instance.currentUser!;
       await user.sendEmailVerification();
     } catch (e) {
+      print('e');
+      print(e);
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
     } on FirebaseException catch(e){
+      print("e.code");
       print(e.code);
     }on FirebaseAuthException catch(e){
+      print("e.code");
       print(e.code);
     }
   }
