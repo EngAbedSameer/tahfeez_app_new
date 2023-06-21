@@ -3,7 +3,7 @@ import 'MenuItem.dart';
 
 class MenuItems {
   static const List<MyMenuItem> items = [
-    itemSync,
+    // itemSync,
     itemImport,
     itemExport,
     // itemDeletData,
@@ -30,5 +30,5 @@ class MenuItems {
   // static const itemUplode =
   //     MyMenuItem(text: "Upload Data", icon: Icons.upload_file_outlined);
   static const itemWhatsapp =
-      MyMenuItem(text: "ارسال النجاز عبر واتساب", icon: Icons.message_outlined);
+      MyMenuItem(text: "إرسال الإنجاز عبر واتساب", icon: Icons.message_outlined);
 }

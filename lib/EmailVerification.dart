@@ -51,12 +51,16 @@ class _EmailVerificationState extends State<EmailVerification> {
     } catch (e) {
       ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text(e.toString())));
+    } on FirebaseException catch(e){
+      print(e.code);
+    }on FirebaseAuthException catch(e){
+      print(e.code);
     }
   }
 
   @override
   Widget build(BuildContext context) => isEmailVerified
-      ? widget.signUp?UserSignupData(memorizerEmail:widget.memorizerEmail):Home()
+      ?Home()
       : Scaffold(
           appBar: AppBar(
             title: Text("Email Verification"),
@@ -68,12 +72,12 @@ class _EmailVerificationState extends State<EmailVerification> {
               Text(textAlign: TextAlign.center,
                   "تم ارسال رابط على عنوان بريدك الإلكتروني ,  يرجى النقر على الرابط للتاكد من هويتك"),
               // CircularProgressIndicator()
-              ElevatedButton(onPressed: (){
-    FirebaseAuth.instance.signOut();
-    Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) {return Login();}),(route)=>false);
+    //           ElevatedButton(onPressed: (){
+    // FirebaseAuth.instance.signOut();
+    // Navigator.pushAndRemoveUntil(context,MaterialPageRoute(builder: (context) {return Login();}),(route)=>false);
 
                 
-              }, child: Text("رجوع"))
+    //           }, child: Text("رجوع"))
             ],
           )),
         );

@@ -57,13 +57,13 @@ class _BottomBarState extends State<BottomBar> {
             onPressed: () {
               if (widget.dailyReplace) {
                 // Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => DaPage(memorizerEmail: widget.memorizerEmail,)));
+                // Navigator.of(context).pushReplacement(
+                //     MaterialPageRoute(builder: (context) => DaPage(memorizerEmail: widget.memorizerEmail,)));
               }
               if (widget.dailyPush) {
                 // Navigator.of(context).popUntil((route) => route.isFirst);
-                Navigator.of(context)
-                    .push(MaterialPageRoute(builder: (context) => DaPage(memorizerEmail: widget.memorizerEmail,)));
+                // Navigator.of(context)
+                //     .push(MaterialPageRoute(builder: (context) => DaPage(memorizerEmail: widget.memorizerEmail,)));
               }
             },
           ),

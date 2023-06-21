@@ -930,64 +930,66 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   onSelected(BuildContext context, MyMenuItem item) async {
-    if (item == MenuItems.itemSync) {
-      // try {
-      // QuickAlert.show(
-      //     context: context,
-      // type: QuickAlertType.loading,
-      //     text: "...جاري المزامنة",
-      //     title: "الرجاء الانتظار قليلا");
-      // FilePicker.platform.clearTemporaryFiles();
-      // // bool sync1 = await syncData(memorizerEmail);
-      // ////////////////////////////////////
-      // var stdCollection =
-      //     await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
-      // QuerySnapshot cloudStudents = await stdCollection.get();
-      // // bool sync2 = await syncRecords(cloudStudents);
-      // //////////////////////////////////////
-      // cloudStudents.docs.forEach((studet) {
-      //   var std = studet.data() as Map;
-      //   myFierstor.setStudentLastUpdate(
-      //       mEmail: memorizerEmail, idn: std['IDn'].toString());
-      // });
-      // String now = _reformateDate(DateTime.now().toString()).toString();
-      // db.setAllStdUpdated(now);
-      // if (sync1 == true && sync2 == true) {
-      //   Navigator.pop(context);
-      //   await QuickAlert.show(
-      //       context: context,
-      //       type: QuickAlertType.success,
-      //       title: "تمت عملية المزامنة بنجاح");
-      // } else {
-      //   Navigator.pop(context);
-      //   await QuickAlert.show(
-      //       context: context,
-      //       type: QuickAlertType.error,
-      //       title: "عذراً، حدثت مشكلة غير متوقعة");
-      // }
+    // if (item == MenuItems.itemSync) {
+    //   // try {
+    //   // QuickAlert.show(
+    //   //     context: context,
+    //   // type: QuickAlertType.loading,
+    //   //     text: "...جاري المزامنة",
+    //   //     title: "الرجاء الانتظار قليلا");
+    //   // FilePicker.platform.clearTemporaryFiles();
+    //   // // bool sync1 = await syncData(memorizerEmail);
+    //   // ////////////////////////////////////
+    //   // var stdCollection =
+    //   //     await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
+    //   // QuerySnapshot cloudStudents = await stdCollection.get();
+    //   // // bool sync2 = await syncRecords(cloudStudents);
+    //   // //////////////////////////////////////
+    //   // cloudStudents.docs.forEach((studet) {
+    //   //   var std = studet.data() as Map;
+    //   //   myFierstor.setStudentLastUpdate(
+    //   //       mEmail: memorizerEmail, idn: std['IDn'].toString());
+    //   // });
+    //   // String now = _reformateDate(DateTime.now().toString()).toString();
+    //   // db.setAllStdUpdated(now);
+    //   // if (sync1 == true && sync2 == true) {
+    //   //   Navigator.pop(context);
+    //   //   await QuickAlert.show(
+    //   //       context: context,
+    //   //       type: QuickAlertType.success,
+    //   //       title: "تمت عملية المزامنة بنجاح");
+    //   // } else {
+    //   //   Navigator.pop(context);
+    //   //   await QuickAlert.show(
+    //   //       context: context,
+    //   //       type: QuickAlertType.error,
+    //   //       title: "عذراً، حدثت مشكلة غير متوقعة");
+    //   // }
 
-      // } catch (e) {
-      //   print('======================= Excaption1 ========================');
+    //   // } catch (e) {
+    //   //   print('======================= Excaption1 ========================');
 
-      //   Navigator.pop(context);
-      //   QuickAlert.show(
-      //       context: context,
-      //       type: QuickAlertType.error,
-      //       text: e.toString(),
-      //       title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
-      // }
-    } else if (item == MenuItems.itemImport) {
+    //   //   Navigator.pop(context);
+    //   //   QuickAlert.show(
+    //   //       context: context,
+    //   //       type: QuickAlertType.error,
+    //   //       text: e.toString(),
+    //   //       title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
+    //   // }
+    // } else 
+    
+    if (item == MenuItems.itemImport) {
       FilePicker.platform.clearTemporaryFiles();
       final result = await FilePicker.platform.pickFiles();
       if (result == null) return;
       final file = result.files.first;
       List<List<Map<String, dynamic>>> data =
           await _exportFromExcelAsListOfMaps(file.path);
-
-      print(data[1]);
       await _uploadeStdDataToFirestore(await data[0]).then((value) {
         _uploadeRecordaDataToFirestore(data[1]);
       });
+      await  ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text("تم ادراج البيانات بنجاح")));
 
       // _importDateToLocalDB(await data);
       // _get1(data);

@@ -162,7 +162,7 @@ class Firestore {
     record.update({'isSynced': "true"});
   }
 
-  addMemorizer(Map<String, dynamic> data) async {
+ Future addMemorizer(Map<String, dynamic> data) async {
     var halaqat = await getHalaqatCollection();
     var temp = halaqat.add({
       'center': data['center'],
@@ -171,6 +171,7 @@ class Firestore {
       "memorizer": {"name": data['name'], "phone": data['phone'].toString()}
     }).then((documentSnapshot) =>
         print("Added Memorizer with ID: ${documentSnapshot.id}"));
+
   }
 
   addStudent({Map<String, dynamic>? data, mEmail}) async {
