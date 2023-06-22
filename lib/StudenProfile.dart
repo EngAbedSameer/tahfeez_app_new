@@ -9,6 +9,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:flutter/src/widgets/ticker_provider.dart';
 // import 'package:tahfeez_app/NewRecord.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -101,7 +102,7 @@ class _StudentProfileState extends State<StudentProfile>
       print(s.toDate().toString());
       return s.toDate().toString().split(" ")[0];
     } else {
-      return date.toString().split("T")[0]; 
+      return date.toString().split("T")[0];
     }
   }
 
@@ -112,8 +113,32 @@ class _StudentProfileState extends State<StudentProfile>
     ScreenUtil.init(context);
     return Scaffold(
       appBar: AppBar(
-        title: Text("ملف الطالب", textAlign: TextAlign.center),
-      ),
+          title: Text("ملف الطالب", textAlign: TextAlign.center),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                print("on delete");
+                QuickAlert.show(
+                  context: context,
+                  type: QuickAlertType.confirm,
+                  title: "هل انت متأكد من عملية الحذف",
+                  text:
+                      "عند حذف الطالب لن تتمكن من الوصول للبيانات القديمة وسيتم حذفها بشكل نهائي ",
+                  confirmBtnText: "حذف",
+                  confirmBtnColor: Colors.red,
+                  onConfirmBtnTap: () {myFierstor.deleteStudent(
+                      widget.memorizerEmail, widget.studentIDn);
+                    // Navigator.pop(context);
+                     Navigator.of(context)
+                                  .popUntil((route) => route.isFirst);
+                      },
+                      
+                );
+                  
+              },
+            ),
+          ]),
       body: FutureBuilder(
           future: _getStudentDate(),
           builder: ((context, AsyncSnapshot<List<Map>> snapshot) {
@@ -253,7 +278,10 @@ class _StudentProfileState extends State<StudentProfile>
                                                     right: 4),
                                                 child: Text(
                                                     recordData['type']
-                                                        .toString(),
+                                                                .toString() ==
+                                                            "1.0"
+                                                        ? "حفظ"
+                                                        : "مراجعة",
                                                     textAlign: TextAlign.center,
                                                     style: TextStyle(
                                                       fontSize: 10,

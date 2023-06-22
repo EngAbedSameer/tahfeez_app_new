@@ -95,9 +95,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //   return result;
   // }
 
-  void exportToExcel(
+  Future exportToExcel(
     List<QueryDocumentSnapshot<Object?>> data,
   ) async {
+
+       QuickAlert.show(
+          context: context,
+          type: QuickAlertType.loading,
+          title:"جاري التصدير...",
+          );
     var records;
     // print(" ============ ON Export 11===========");
 
@@ -191,51 +197,39 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
               .value = list[row]['f_name'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
               .value = list[row]['m_name'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
               .value = list[row]['l_name'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
               .value = list[row]['IDn'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
               .value = list[row]['DOB'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
               .value = list[row]['phone'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
               .value = list[row]['school'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
               .value = list[row]['level'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
               .value = list[row]['attendance'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 9, rowIndex: row))
               .value = list[row]['points'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: row))
               .value = list[row]['lastTest'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 11, rowIndex: row))
               .value = list[row]['lastTestDegree'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 12, rowIndex: row))
               .value = list[row]['last_update'].toString();
@@ -243,15 +237,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
               .value = list[row]['surah'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
               .value = list[row]['from'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
               .value = list[row]['to'].toString();
-
           if (list[row]['date'].runtimeType == Timestamp) {
             var s = list[row]['date'] as Timestamp;
             print(s.toDate().toString());
@@ -285,15 +276,24 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       }
     }
     var fileBytes = excel.save(fileName: 'data.xlsx');
-    saveFile(fileBytes, 'data.xlsx');
+    saveFile(fileBytes, 'data.xlsx').then((value) {
+      Navigator.pop(context);
+         QuickAlert.show(
+          context: context,
+          type: QuickAlertType.success,
+          text:"تم التصدير بنجاح",
+         );
+
+      //  Navigator.pop(context);
+       
+       });
     setState(() {
       executionTime = stopwatch.elapsed;
     });
+
   }
 
   Future<bool> saveFile(fileBytes, fileName) async {
-    print(" =============== save ===========");
-
     Directory? directory;
     try {
       if (Platform.isAndroid) {
@@ -311,8 +311,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             }
           }
           newPath = newPath + "/Tahfeez";
-          // print(" =============== save22222 ===========  " + newPath);
-
           directory = Directory(newPath);
           directory.create(recursive: true);
         } else {
@@ -328,11 +326,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         saveFile.create();
         saveFile.writeAsBytes(fileBytes);
       }
-      ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("تم التصدير بنجاح")));
       return false;
     } catch (exception, stackTrace) {
-      print(exception);
       await Sentry.captureException(
         exception,
         stackTrace: stackTrace,
@@ -449,7 +444,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   }
 
   // _importDateToLocalDB(List<List<Map>> dataList) async {
-
   //   dataList[0].forEach((std) {
   //     //previous_points
   //     var sql =
@@ -458,9 +452,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //     // print("\n");
   //     db.insertData(sql);
   //   });
-
   //   /* This method is ready to use, just un-command it */
-
   //   // print(" ============== Atten 22=============");
   //   // dataList[1].forEach((std) {
   //   //   var sql =
@@ -994,21 +986,12 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       // _importDateToLocalDB(await data);
       // _get1(data);
     } else if (item == MenuItems.itemExport) {
-      // getFirestoreDataAsListWithID("users");
-      // _get1(_exportAllRecordsDate(), _exportAllAttendanceDate(),
-      //     _exportAllStudetDate());
       var stemp =
           await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
-      var std = await stemp.get();
-
+      var std  = await stemp.get();
       exportToExcel(std.docs
-          // await _exportAllStudetDate(),
-          // await _exportAllRecordsDate(),
-          // await _exportAllAttendanceDate(),
           );
-      // _exportAllRecordsDate();
-      // _exportAllAttendanceDate();
-      // _exportAllStudetDate();
+     
     }
     // else if (item == MenuItems.itemDeletAll)
     //   db.deleteDatabaseFromDvice();

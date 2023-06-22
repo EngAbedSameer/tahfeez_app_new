@@ -138,15 +138,14 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       print('''
 user is 
 ${user}''');
-      if (user == null) { 
-         setState(() {
-           isLogin = false;
+      if (user == null) {
+        setState(() {
+          isLogin = false;
         });
       } else {
         setState(() {
-           isLogin = true;
+          isLogin = true;
         });
-       
       }
     });
   }
@@ -324,22 +323,31 @@ ${user}''');
                                                           .trim(),
                                                       _passwordController.text
                                                           .trim())
-                                                  ? Navigator.pushReplacement(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                          builder: (context) {
-                                                      return FirebaseAuth
-                                                              .instance
-                                                              .currentUser!
-                                                              .emailVerified
-                                                          ? Home()
-                                                          : EmailVerification(
-                                                              memorizerEmail:
-                                                                  _emailController
-                                                                      .text
-                                                                      .toString(),
-                                                              signUp: false);
-                                                    }))
+                                                  ? {
+                                                      if (FirebaseAuth.instance
+                                                              .currentUser !=
+                                                          null)
+                                                        {
+                                                          Navigator.pushReplacement(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                  builder:
+                                                                      (context) {
+                                                            return FirebaseAuth
+                                                                    .instance
+                                                                    .currentUser!
+                                                                    .emailVerified
+                                                                ? Home()
+                                                                : EmailVerification(
+                                                                    memorizerEmail:
+                                                                        _emailController
+                                                                            .text
+                                                                            .toString(),
+                                                                    signUp:
+                                                                        false);
+                                                          }))
+                                                        }
+                                                    }
                                                   : print("Error")
                                             };
                                     }
@@ -390,11 +398,12 @@ ${user}''');
       return StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshots) {
-            return snapshots.hasData?
-             EmailVerification(
-              memorizerEmail: snapshots.data!.email.toString(),
-              signUp: singup,
-            ):  Text("sd");
+            return snapshots.hasData
+                ? EmailVerification(
+                    memorizerEmail: snapshots.data!.email.toString(),
+                    signUp: singup,
+                  )
+                : Text("sd");
           });
     }
   }

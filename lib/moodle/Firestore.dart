@@ -225,42 +225,13 @@ class Firestore {
   deleteStudent(mEmail, stdIDn) async {
     final students = await getStudentsCollection(mEmail: mEmail);
     var s = await students.where("IDn", isEqualTo: stdIDn!).get();
-    // students.doc(s.docs.first.id.toString()).delete().then(
-    //       (doc) => print("Document deleted"),
-    //       onError: (e) => print("Error updating document $e"),
-    //     );
+      students.doc(s.docs.single.id).update({'isDeleted':'true'}).then(
+      (doc) => print("Document is deleted now"),
+      onError: (e) => print("Error updating document $e"),
+    );
   }
 
-/**
- * 
- * **
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
- * *
+/*
  * *
  * *
  * *
