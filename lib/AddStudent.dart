@@ -165,9 +165,9 @@ class _AddStudentState extends State<AddStudent>
                       SizedBox(
                         height: 20,
                       ),
-                      CircleAvatar(
+                      CircleAvatar(backgroundColor: Colors.green,
                         radius: 50,
-                        backgroundImage: AssetImage("assets/images/splash.jpg"),
+                        backgroundImage: AssetImage("assets/icon/logo.png"),
                       ),
                       SizedBox(
                         height: 20,

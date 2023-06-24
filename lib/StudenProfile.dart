@@ -155,8 +155,7 @@ class _StudentProfileState extends State<StudentProfile>
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: CircleAvatar(
                           radius: 50,
-                          backgroundImage:
-                              AssetImage("assets/images/splash.jpg"),
+                               child: Image.asset("assets/icon/person.png"),
                         ),
                       ),
                       Text(

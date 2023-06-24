@@ -40,7 +40,7 @@ class MyHome extends StatelessWidget {
     return  
     // BugReportOverlay();
      MaterialApp(
-      debugShowCheckedModeBanner: false,
+      debugShowCheckedModeBanner: false, 
       title: 'Tahfeez',
       theme: ThemeData(
         primarySwatch: Colors.green,
@@ -73,7 +73,7 @@ class _Splash extends State<Splash> {
   Widget build(BuildContext context) {
     return Scaffold(
         body: Center(
-      child: Image.asset("assets/images/splash.jpg", width: 200),
+      child: Image.asset("assets/icon/logo.png", width: 200),
     ));
   }
 }

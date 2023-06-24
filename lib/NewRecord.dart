@@ -316,10 +316,10 @@ class _NewRecordState extends State<NewRecord>
             textDirection: TextDirection.rtl,
             child: ListView(padding: EdgeInsets.all(20.0), children: [
               CircleAvatar(
-                //image
-                radius: 50,
-                backgroundImage: AssetImage("assets/images/splash.jpg"),
-              ),
+                          radius: 50,
+                          backgroundColor: Colors.white,
+                               child: Image.asset("assets/icon/logo.png"),
+                        ),
               SizedBox(
                 //white space
                 height: 50,

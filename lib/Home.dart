@@ -98,12 +98,11 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   Future exportToExcel(
     List<QueryDocumentSnapshot<Object?>> data,
   ) async {
-
-       QuickAlert.show(
-          context: context,
-          type: QuickAlertType.loading,
-          title:"جاري التصدير...",
-          );
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.loading,
+      title: "جاري التصدير...",
+    );
     var records;
     // print(" ============ ON Export 11===========");
 
@@ -278,19 +277,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     var fileBytes = excel.save(fileName: 'data.xlsx');
     saveFile(fileBytes, 'data.xlsx').then((value) {
       Navigator.pop(context);
-         QuickAlert.show(
-          context: context,
-          type: QuickAlertType.success,
-          text:"تم التصدير بنجاح",
-         );
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.success,
+        text: "تم التصدير بنجاح",
+      );
 
       //  Navigator.pop(context);
-       
-       });
+    });
     setState(() {
       executionTime = stopwatch.elapsed;
     });
-
   }
 
   Future<bool> saveFile(fileBytes, fileName) async {
@@ -968,8 +965,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     //   //       text: e.toString(),
     //   //       title: "حدث خلل غير متوقع, قم بإرسال لقطة شاشة للدعم الفني");
     //   // }
-    // } else 
-    
+    // } else
+
     if (item == MenuItems.itemImport) {
       FilePicker.platform.clearTemporaryFiles();
       final result = await FilePicker.platform.pickFiles();
@@ -980,7 +977,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       await _uploadeStdDataToFirestore(await data[0]).then((value) {
         _uploadeRecordaDataToFirestore(data[1]);
       });
-      await  ScaffoldMessenger.of(context)
+      await ScaffoldMessenger.of(context)
           .showSnackBar(SnackBar(content: Text("تم ادراج البيانات بنجاح")));
 
       // _importDateToLocalDB(await data);
@@ -988,10 +985,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     } else if (item == MenuItems.itemExport) {
       var stemp =
           await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
-      var std  = await stemp.get();
-      exportToExcel(std.docs
-          );
-     
+      var std = await stemp.get();
+      exportToExcel(std.docs);
     }
     // else if (item == MenuItems.itemDeletAll)
     //   db.deleteDatabaseFromDvice();
@@ -1119,24 +1114,23 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(children: [
-                                  CircleAvatar(
-                                    radius: 15,
-                                    backgroundColor: Colors.grey,
-                                    child: IconButton(
-                                      icon: Icon(
-                                        size: 15,
-                                        Icons.person,
-                                        color: Colors.white,
+                                  Container(width: 35,padding: EdgeInsets.all(0),margin: EdgeInsets.all(0),
+                                    child: GestureDetector(
+                                      child: CircleAvatar(
+                                        radius: 20,
+                                        child: Image.asset(
+                                          "assets/icon/person.png",
+                                          
+                                        ),
                                       ),
-                                      onPressed: () {
+                                      onTap: () {
                                         // db.insertData(
                                         //     "INSERT INTO 'Records' (std_id, surah, date, frm, t, quality) VALUES ( '${stdData['id']}' , 'amma' , 20/10/2022 , 1 , 20)");
                                         Navigator.of(context).push(
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     StudentProfile(
-                                                      studentIDn:
-                                                          stdData['IDn'],
+                                                      studentIDn: stdData['IDn'],
                                                       memorizerEmail:
                                                           memorizerEmail,
                                                     )));
