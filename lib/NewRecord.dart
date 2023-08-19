@@ -295,6 +295,8 @@ class _NewRecordState extends State<NewRecord>
     SearchFieldListItem("الفلق", item: "الفلق"),
     SearchFieldListItem("الناس", item: "الناس"),
   ];
+
+  
 // checkConnection()async{
 //  try{ var n = await InternetAddress.lookup('google.com');
 //       if (!n.isEmpty || n != null) {
@@ -318,7 +320,7 @@ class _NewRecordState extends State<NewRecord>
               CircleAvatar(
                           radius: 50,
                           backgroundColor: Colors.white,
-                               child: Image.asset("assets/icon/logo.png"),
+                              child: Image.asset("assets/icon/logo.png"),
                         ),
               SizedBox(
                 //white space
@@ -418,6 +420,27 @@ class _NewRecordState extends State<NewRecord>
                               )
                             ],
                           ),
+                          Container(
+                            child: TextFormField(
+                              //page cout
+                              textInputAction: TextInputAction.next,
+                              decoration: const InputDecoration(
+                                labelText: 'عدد الصفحات',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'يجب تعبئة هذه الخانة';
+                                } else if (double.parse(value) < 0.5) {
+                                  return 'لا يمكن ادخال قيمة اقل من 0.5';
+                                }
+                                return null;
+                              },
+                              controller: _pgsCountController,
+                              keyboardType: TextInputType.numberWithOptions(
+                                  decimal: false, signed: false),
+                            ),
+                            width: _screenWidth * 0.4,
+                          ),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             crossAxisAlignment: CrossAxisAlignment.end,
@@ -451,27 +474,7 @@ class _NewRecordState extends State<NewRecord>
                               ),
                             ],
                           ),
-                          Container(
-                            child: TextFormField(
-                              //page cout
-                              textInputAction: TextInputAction.next,
-                              decoration: const InputDecoration(
-                                labelText: 'عدد الصفحات',
-                              ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'يجب تعبئة هذه الخانة';
-                                } else if (double.parse(value) < 0.5) {
-                                  return 'لا يمكن ادخال قيمة اقل من 0.5';
-                                }
-                                return null;
-                              },
-                              controller: _pgsCountController,
-                              keyboardType: TextInputType.numberWithOptions(
-                                  decimal: false, signed: false),
-                            ),
-                            width: _screenWidth * 0.4,
-                          ),
+                          
                           Container(
                             child: TextFormField(
                               //commitment
@@ -552,5 +555,6 @@ class _NewRecordState extends State<NewRecord>
           addStudent: true,
           memorizerEmail: widget.memorizerEmail,
         ));
+  
   }
 }

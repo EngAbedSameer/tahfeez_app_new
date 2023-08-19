@@ -10,7 +10,7 @@ class MenuItems {
     // itemDeletAll,
     // itemUplode,
     itemLogout,
-    itemWhatsapp,
+    // itemWhatsapp,
     // itemContactUs
   ];
 

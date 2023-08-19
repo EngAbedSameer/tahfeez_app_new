@@ -3,7 +3,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:math';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart' as intl;
@@ -210,7 +209,6 @@ class Firestore {
 
   addOldRecord({Map<String, dynamic>? data, idn, mEmail}) async {
     print('''try to add record of 
-      $data
       for $idn
       in memorizer $mEmail
       with data : 

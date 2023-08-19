@@ -68,7 +68,7 @@ class WhatsappMassage {
           "surah": "لم يسمع",
           "from": "",
           "to": "",
-          "pgs": ""
+          "pgs": "0"
         });
       }
       // print(stdName);
@@ -92,7 +92,7 @@ class WhatsappMassage {
         msg += '\n❌${data[i]["name"]} ${data[i]["surah"]}';
       else
         msg +=
-            '\n✅${data[i]["name"]} سورة ${data[i]["surah"]} من ${data[i]["from"]} الى ${data[i]["to"]}';
+            '\n✅${data[i]["name"]} سورة ${data[i]["surah"]} من ${data[i]["from"]} الى ${data[i]["to"]} (${data[i]["pgs"]} صفحة)';
     }
     send(msg);
   }

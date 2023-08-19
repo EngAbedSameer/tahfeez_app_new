@@ -2,19 +2,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
-import 'package:quickalert/models/quickalert_options.dart';
-import 'package:quickalert/quickalert.dart';
-import 'package:quickalert/widgets/quickalert_buttons.dart';
-import 'package:quickalert/widgets/quickalert_container.dart';
 import 'package:tahfeez_app/Login.dart';
-import 'package:tahfeez_app/daeily.dart';
 import 'package:tahfeez_app/firebase_options.dart';
 import 'package:tahfeez_app/moodle/SenrtyReports.dart';
-import 'package:tahfeez_app/moodle/bug-report-overlay.dart';
-import 'package:tahfeez_app/sqfDB.dart';
-import 'Home.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-// ضيف الية تسجيل مراجعة او سرد مجموعة من السور
+/*
+* TODO: ضيف الية تسجيل مراجعة او سرد مجموعة من السور
+* FIXME: fix date width in record card
+*/
+
+
 main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(

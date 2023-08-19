@@ -49,6 +49,7 @@ class _StudentProfileState extends State<StudentProfile>
   late TextStyle cardTextStyle =
       TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, height: 2.5);
   late TextStyle cardMainTextStyle = TextStyle(
+    
       fontSize: 14.sp,
       fontWeight: FontWeight.bold,
       height: 2.5,
@@ -304,16 +305,19 @@ class _StudentProfileState extends State<StudentProfile>
                                                               .spaceBetween,
                                                       children: [
                                                         Row(
+                                                          
                                                           children: [
                                                             Text("التاريخ : ",
                                                                 style:
                                                                     cardMainTextStyle),
-                                                            Text(
-                                                                getRecordDate(
-                                                                    recordData[
-                                                                        'date']),
-                                                                style:
-                                                                    cardTextStyle),
+                                                            Container(width: 100,height: 50,
+                                                              child: Text(
+                                                                  getRecordDate(
+                                                                      recordData[
+                                                                          'date']),softWrap: true,
+                                                                  style:
+                                                                      cardTextStyle),
+                                                            ),
                                                           ],
                                                         ),
                                                         Row(

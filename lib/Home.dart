@@ -22,7 +22,7 @@ import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/MenuItem.dart';
 import 'package:tahfeez_app/moodle/MenuItems.dart';
 import 'package:tahfeez_app/moodle/bug-report-overlay.dart';
-import 'package:tahfeez_app/moodle/student.dart';
+import 'package:tahfeez_app/moodle/Student.dart';
 import 'package:tahfeez_app/services/MapStyle.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'sqfDB.dart';
@@ -111,27 +111,22 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     for (int j = 0; j < data.length; j++) {
       t1.add(data[j].data() as Map);
       var stdData = data[j].data() as Map;
-      print(stdData['IDn']);
       var rtemp = await myFierstor.getRecordsCollection(
           mEmail: memorizerEmail, idn: stdData['IDn']);
       var records = await rtemp.get();
-      var record;
+      Map record;
       for (int i = 0; i < records.docs.length; i++) {
         print("rec.id");
         print(records.docs[i].id);
         record = await records.docs[i].data() as Map;
+        record.addEntries({"IDn": stdData['IDn']}.entries);
         t2.add(await record);
       }
     }
-
-    // var t3 = List<Map>.from(_d[2]);
-
     List<List<Map>> _data = [];
     _data.add(t1);
     _data.add(t2);
-    // _data.add(t3);
     final stopwatch = Stopwatch()..start();
-
     _data[0].insert(
         0,
         {
@@ -149,7 +144,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           'lastTestDegree': 'درجة اخر اختبار ',
           'last_update': 'اخر تحديث'
         } as Map);
-
     // _data[2].insert(
     //     0,
     //     {
@@ -158,10 +152,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     //       'name': 'الإسم ',
     //       "date": "التاريخ"
     //     } as Map);
-
     _data[1].insert(
         0,
         {
+          "IDn": "رقم هوية الطالب",
           "surah": "السورة",
           "from": "من",
           "to": "الى",
@@ -172,25 +166,35 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           "type": 'نوع التسجيل',
           // "isSynced": "تمت المزامنة؟"
         } as Map);
-
     final excel = Excel.createExcel();
-    Sheet sheet = excel[excel.getDefaultSheet()!];
 
+    print(excel.sheets.keys);
+    // excel.link("data", sheet);
+    Sheet sheet = excel['data'];
+    print(excel.sheets.keys);
     excel.link("records", sheet);
+    // excel.link("data", sheet);
+    // excel.rename("Sheet1", "data");
     // excel.link("attendance", sheet);
+    excel.unLink("Sheet1");
+    excel.delete("Sheet1");
+
     excel.unLink("records");
+    print(excel.sheets.keys);
+
     // excel.unLink("attendance");
     // print(_data[1].keys);
-
     for (var j = 0; j < _data.length; j++) {
       sheet = excel.sheets.values.elementAt(j);
       print(excel.sheets.values.elementAt(j).sheetName);
       var list = _data[j];
+      /* add  titles row  */
       for (var i = 0; i < list[0].keys.length; i++) {
         sheet
             .cell(CellIndex.indexByColumnRow(columnIndex: i, rowIndex: 0))
             .value = list[0].keys.elementAt(i);
       }
+
       for (var row = 0; row < list.length; row++) {
         if (j == 0) {
           sheet
@@ -235,41 +239,45 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         } else if (j == 1) {
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
-              .value = list[row]['surah'].toString();
+              .value = list[row]['IDn'].toString();
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
-              .value = list[row]['from'].toString();
+              .value = list[row]['surah'].toString();
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
+              .value = list[row]['from'].toString();
+          sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
               .value = list[row]['to'].toString();
           if (list[row]['date'].runtimeType == Timestamp) {
             var s = list[row]['date'] as Timestamp;
-            print(s.toDate().toString());
+            print(s.toDate().toString() + " 1111111111");
             sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
+                .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
                 .value = s.toDate().toString();
           } else {
             sheet
-                .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
+                .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
                 .value = list[row]['date'].toString();
           }
-
-          sheet
-              .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
-              .value = list[row]['quality'].toString();
-
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
-              .value = list[row]['pgsCount'].toString();
-
+              .value = list[row]['quality'].toString();
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
-              .value = list[row]['commitment'].toString();
-
+              .value = list[row]['pgsCount'].toString();
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
+              .value = list[row]['commitment'].toString();
+          sheet
+              .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
               .value = (list[row]['type'].toString() == '1') ? "مراجعة" : "حفظ";
         }
+
+//         print('''
+// 12212121212121212
+// ${sheet.cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row)).value}              ''');
+
         print(" ============ ON Export ===========");
         // print(list[row]);
       }
@@ -282,7 +290,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         type: QuickAlertType.success,
         text: "تم التصدير بنجاح",
       );
-
       //  Navigator.pop(context);
     });
     setState(() {
@@ -388,9 +395,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         // print(" ============== Data =============");
         print(table.characters.toString());
       }
-
       /* This method is ready to use, just un-command it */
-
       // else if (table.characters.toString() == "attendances") {
       //   print(" ================= attendences ================= ");
       //   List<Map<String, dynamic>> temp = [];
@@ -411,24 +416,43 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       //   // print(fileData);
       // }
       else if (table.characters.toString() == "records") {
-        print(" ================= records ================= ");
+        print(
+            " ================= records ================= ${excel.tables[table]!.rows.length} ");
         List<Map<String, dynamic>> temp = [];
+//         print(
+//             "excel.tables[table]!.cu.length = ${excel.tables[table]!.rows.length}");
+//         print(
+//             "excel.tables[table]!.cu.length = ${excel.tables[table]!.rows.first.length}");
+//         for (int j = 0; j < excel.tables[table]!.rows.length; j++) {
+//           print('''${excel.tables[table]!.rows.first[j]!.cellIndex}
+// ${excel.tables[table]!.rows.first[j]!.colIndex}
+// ${excel.tables[table]!.rows.first[j]!.rowIndex}
+// ${excel.tables[table]!.rows.first[j]!.cellType}
+// ${excel.tables[table]!.rows.elementAt(2)[0]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[1]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[2]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[3]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[4]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[5]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[6]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[7]!.value}
+// ${excel.tables[table]!.rows.elementAt(2)[8]!.value}
 
+// -------------------------------------------------------
+//             ''');
+//         }
         for (var row in excel.tables[table]!.rows) {
-          // print(row[0]!.value);
-          // print("\n");
-
+          print(row[0]!.value);
           temp.add({
-            'surah': row[0]!.value,
-            'from': row[1]!.value,
-            'to': row[2]!.value,
-            'date': row[3]!.value,
-            'quality': row[4]!.value,
-            'pgsCount': row[5]!.value,
-            'commitment': row[6]!.value,
-            'IDn': row[7]!.value,
+            'IDn': row[0]!.value,
+            'surah': row[1]!.value,
+            'from': row[2]!.value,
+            'to': row[3]!.value,
+            'date': row[4]!.value,
+            'quality': row[5]!.value,
+            'pgsCount': row[6]!.value,
+            'commitment': row[7]!.value,
             'type': row[8]!.value,
-            'isSynced': "false"
           });
         }
         temp.removeAt(0);
@@ -472,7 +496,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //   ScaffoldMessenger.of(context)
   //       .showSnackBar(SnackBar(content: Text("تم ادراج البيانات بنجاح")));
   // }
-
   PopupMenuItem<MyMenuItem> buildItem(MyMenuItem item) {
     return PopupMenuItem<MyMenuItem>(
       value: item,
@@ -490,7 +513,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       ),
     );
   }
-
   // updateLocalDatabase(Map data) async {
   //   String school = data['school'].toString();
   //   await db.updateData(
@@ -524,7 +546,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //   });
   //   return myData;
   // }
-
 //   syncStudentData(DateTime cloudDate, DateTime localDate, cloudStudent,
 //       Map<Object, Object> localStudent) {
 //     print("sync student data method");
@@ -536,23 +557,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //       // syncRecords();
 //     } else if (cloudDate.compareTo(localDate) <= -1) {
 //       print("firestore data is old");
-
 //       // firestore data is old
 //       // syncRecords();
-
 //       myFierstor.setStudentData(
 //           mEmail: memorizerEmail,
 //           data: localStudent,
 //           idn: cloudStudent['IDn'].toString());
 //     }
 //   }
-
 //   syncRecords(QuerySnapshot cloudStudents) async {
 //     try {
 //       print(" sync records method  ****************************** ");
-
 //       var _cloudStudents = cloudStudents.docs;
-
 //       for (int i = 0; i < _cloudStudents.length; i++) {
 //         var stdDoc = _cloudStudents[i];
 //         print("foreach cloud students  ****************************** ");
@@ -569,22 +585,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //             '$cloudeLastUpdate     $localLastUpdate   ****************************** ');
 //         if (cloudeLastUpdate.compareTo(localLastUpdate) >= 1) {
 //           print("local data is old  ****************************** ");
-
 //           if (myFierstor.doseStdHasRecords(
 //               memorizerEmail, cloudStudent['IDn'])) {
 //             print(
 //                 "if student ${cloudStudent['IDn']} has records  ****************************** ");
-
 //             var cloudeRecords = List<QueryDocumentSnapshot>.from(
 //                 await myFierstor.getStudentRecords(
 //                     mEmail: memorizerEmail,
 //                     idn: cloudStudent['IDn'].toString()));
-
 //             // cloudeRecords.forEach((rd) async
 //             for (int j = 0; j < cloudeRecords.length; j++) {
 //               var rd = cloudeRecords[j];
 //               Map record = rd.data() as Map;
-
 //               if (record['isSynced'] == "false") {
 //                 MapStyle().printMap(record);
 //                 print(
@@ -672,7 +684,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //       return true;
 //     } catch (e) {
 //       print('======================= Excaption5 ========================');
-
 //       // QuickAlert.show(
 //       //     context: context,
 //       //     type: QuickAlertType.error,
@@ -681,32 +692,25 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //       return false;
 //     }
 //   }
-
 //   syncData(mEmail) async {
 //     try {
 //       print("sync data method");
-
 //       CollectionReference _firestoreData =
 //           await myFierstor.getStudentsCollection(mEmail: mEmail);
-
 //       QuerySnapshot students = await _firestoreData.get();
 //       List<Map> _db = await db.readData("select * from Students") as List<Map>;
 //       var cloudDate, localDate;
 //       Map<Object, Object> localStudent = {};
 //       var cloudStudent;
-
 //       if (students.docs.length == _db.length) {
 //         print("if have same number of std");
-
 //         for (int i = 0; i < students.docs.length; i++) {
 //           print("for all students in cloud");
-
 //           cloudStudent = students.docs[i].data() as Map;
 //           // Map temp = await _db
 //           //     .where((element) =>
 //           //         element['IDn'].toString() == cloudStudent['IDn'].toString())
 //           //     .single;
-
 //           List<Map> _temp = await db.readData(
 //               'select * from Students where IDn=${cloudStudent['IDn']}');
 //           Map temp = _temp.single;
@@ -722,7 +726,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //           if ((localStudent != null && cloudStudent != null) &&
 //               (!localStudent.isEmpty && !cloudStudent.isEmpty)) {
 //             print("if local and cloud not empty");
-
 //             syncStudentData(cloudDate, localDate, cloudStudent, localStudent);
 //             // if (cloudDate.compareTo(localDate) >= 1) {
 //             //   // local data is old
@@ -741,12 +744,10 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //           } else if ((!cloudStudent.isEmpty && localStudent.isEmpty) ||
 //               (cloudStudent != null && localStudent == null)) {
 //             print("if local empty : do no thing in this case");
-
 //             // updateLocalDatabase(cloudStudent);
 //           } else if ((cloudStudent.isEmpty && !localStudent.isEmpty) ||
 //               (cloudStudent == null && localStudent != null)) {
 //             print("if cloud empty : do no thing in this case");
-
 //             // myFierstor.setStudentData(
 //             //     email: memorizerEmail,
 //             //     data: localStudent as Map<Object, Object>,
@@ -765,22 +766,17 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //       } else if (students.docs.length < _db.length) {
 //         print(
 //             "if local have more students than cloud,\n set all local student into new student lest");
-
 //         List<Map> newstudents = List.from(_db);
 //         if (students.docs.length != 0) {
 //           print("and cloud not 0 length (has students collection)");
-
 //           for (int i = 0; i < _db.length; i++) {
 //             print("for all local students");
-
 //             for (int j = 0; j < students.docs.length; j++) {
 //               print("for all cloud students");
-
 //               if (_db[i]['IDn'].toString() ==
 //                   students.docs[j]['IDn'].toString()) {
 //                 print(
 //                     "if local student id is in cloud (student id), remove student from new list");
-
 //                 newstudents
 //                     .removeWhere((element) => element['IDn'] == _db[i]['IDn']);
 //                 break;
@@ -799,7 +795,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //         newstudents.forEach((std) async {
 //           print(
 //               "foreach student in new list(student dose not saved in cloud) add student to cloud...");
-
 //           await myFierstor.addStudent(
 //               data: std as Map<String, dynamic>, mEmail: memorizerEmail);
 //         });
@@ -807,21 +802,16 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //         print(
 //             "if cloud have more students than local,\n set all cloud student into new student lest");
 //         ;
-
 //         List newstudents = List.from(students.docs.toList());
 //         if (students.docs.length != 0) {
 //           print("if cloud not Empty (hase student collection)");
-
 //           for (int i = 0; i < students.docs.length; i++) {
 //             print("for all std in cloud");
-
 //             for (int j = 0; j < _db.length; j++) {
 //               print("for all std in local");
-
 //               if (_db[j]['IDn'].toString() ==
 //                   students.docs[i]['IDn'].toString()) {
 //                 print("if std exict in both, remove from new list");
-
 //                 newstudents.removeWhere(
 //                     (element) => element['IDn'] == students.docs[i]['IDn']);
 //                 break;
@@ -831,7 +821,6 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //         }
 //         for (int s = 0; s < newstudents.length; s++) {
 //           print("for all new std list\n insert to local");
-
 //           var std = newstudents[s];
 //           int response = await db.insertData(
 //               "INSERT INTO 'Students' (f_name, m_name ,l_name, IDn, DOB ,phone, school, level, score, attendance, commitment, points, lastTest ,lastTestDegree ,last_update) VALUES ('${std['f_name']}', '${std['m_name']}', '${std['l_name']}' , '${std['IDn']}' ,'${std['DOB']}','${std['phone']}', '${std['school']}', '${std['level']}', '${std['score']}','${std['attendance']}','${std['commitment']}','${std['points']}','${std['lastTest']}' , '${std['lastTestDegree']}' , '${std['last_update']}')");
@@ -902,6 +891,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 //   }
 
   Future _uploadeStdDataToFirestore(List<Map<String, dynamic>> data) async {
+    print('data in uploud');
     for (int i = 0; i < data.length; i++) {
       data[i].addEntries({'m-email': memorizerEmail}.entries);
       await myFierstor.addStudent(data: data[i], mEmail: memorizerEmail);
@@ -910,7 +900,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
 
   _uploadeRecordaDataToFirestore(List<Map<String, dynamic>> data) async {
     print('Record');
-    // print(data);
+    print(data);
     for (int i = 0; i < data.length; i++) {
       data[i].addEntries({'m-email': memorizerEmail}.entries);
       await myFierstor.addOldRecord(
@@ -971,14 +961,26 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       FilePicker.platform.clearTemporaryFiles();
       final result = await FilePicker.platform.pickFiles();
       if (result == null) return;
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.loading,
+        title: "جاري الاستيراد...",
+      );
       final file = result.files.first;
       List<List<Map<String, dynamic>>> data =
           await _exportFromExcelAsListOfMaps(file.path);
+      print(data);
       await _uploadeStdDataToFirestore(await data[0]).then((value) {
         _uploadeRecordaDataToFirestore(data[1]);
       });
-      await ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text("تم ادراج البيانات بنجاح")));
+      Navigator.pop(context);
+      QuickAlert.show(
+        context: context,
+        type: QuickAlertType.success,
+        text: "تم استيراد بنجاح",
+      );
+      // await ScaffoldMessenger.of(context)
+      //     .showSnackBar(SnackBar(content: Text("تم ادراج البيانات بنجاح")));
 
       // _importDateToLocalDB(await data);
       // _get1(data);
@@ -986,6 +988,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
       var stemp =
           await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
       var std = await stemp.get();
+      print(std.docs.first.data());
       exportToExcel(std.docs);
     }
     // else if (item == MenuItems.itemDeletAll)
@@ -999,17 +1002,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
     //   //     await _getStudentDate() as List<Map<String, dynamic>>;
     //   // fb.upload(l);
     // }
-    else if (item == MenuItems.itemWhatsapp) {
-      QuickAlert.show(
-          context: context,
-          type: QuickAlertType.loading,
-          title: "جاري تجهيز الرسالة");
-      WhatsappMassage()
-          .getRecordsToMessage(memorizerEmail)
-          .then((value) => Navigator.pop(context));
-      // var url = "whatsapp://send?&text=hello";
-      // await launch(url);
-    } else if (item == MenuItems.itemLogout) {
+    // else if (item == MenuItems.itemWhatsapp) {
+    //   QuickAlert.show(
+    //       context: context,
+    //       type: QuickAlertType.loading,
+    //       title: "جاري تجهيز الرسالة");
+    //   WhatsappMassage()
+    //       .getRecordsToMessage(memorizerEmail)
+    //       .then((value) => Navigator.pop(context));
+    //   // var url = "whatsapp://send?&text=hello";
+    //   // await launch(url);
+    // }
+    else if (item == MenuItems.itemLogout) {
       logout();
     }
     // else if (item == MenuItems.itemContactUs) {
@@ -1079,6 +1083,18 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("الرئيسية"),
+              IconButton(
+                icon: Icon(Icons.message),
+                onPressed: () {
+                  QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.loading,
+                      title: "جاري تجهيز الرسالة");
+                  WhatsappMassage()
+                      .getRecordsToMessage(memorizerEmail)
+                      .then((value) => Navigator.pop(context));
+                },
+              )
             ],
           ),
         ),
@@ -1114,13 +1130,15 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Row(children: [
-                                  Container(width: 35,padding: EdgeInsets.all(0),margin: EdgeInsets.all(0),
+                                  Container(
+                                    width: 35,
+                                    padding: EdgeInsets.all(0),
+                                    margin: EdgeInsets.all(0),
                                     child: GestureDetector(
                                       child: CircleAvatar(
                                         radius: 20,
                                         child: Image.asset(
                                           "assets/icon/person.png",
-                                          
                                         ),
                                       ),
                                       onTap: () {
@@ -1130,7 +1148,8 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                                             MaterialPageRoute(
                                                 builder: (context) =>
                                                     StudentProfile(
-                                                      studentIDn: stdData['IDn'],
+                                                      studentIDn:
+                                                          stdData['IDn'],
                                                       memorizerEmail:
                                                           memorizerEmail,
                                                     )));
