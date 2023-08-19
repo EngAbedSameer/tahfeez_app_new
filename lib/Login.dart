@@ -10,7 +10,7 @@ import 'package:tahfeez_app/moodle/Firestore.dart';
 // import 'package:tahfeez_app/Home.dart';
 // import 'package:tahfeez_app/moodle/firebase-oprations.dart';
 // import 'package:tahfeez_app/moodle/DataSet.dart' as data;
-import 'package:tahfeez_app/sqfDB.dart';
+// import 'package:tahfeez_app/sqfDB.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class Login extends StatefulWidget {

@@ -1,6 +1,6 @@
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tahfeez_app/sqfDB.dart';
+// import 'package:tahfeez_app/sqfDB.dart';
 
 class HalaqaModel{
   final String? id;

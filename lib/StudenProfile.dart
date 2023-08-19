@@ -1,4 +1,6 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables, implementation_imports, curly_braces_in_flow_control_structures, unused_element
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:age_calculator/age_calculator.dart';
@@ -13,7 +15,7 @@ import 'package:quickalert/quickalert.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'sqfDB.dart';
+// import 'sqfDB.dart';
 import 'dart:ui' as def;
 
 class StudentProfile extends StatefulWidget {
@@ -49,7 +51,6 @@ class _StudentProfileState extends State<StudentProfile>
   late TextStyle cardTextStyle =
       TextStyle(fontSize: 14.sp, fontWeight: FontWeight.bold, height: 2.5);
   late TextStyle cardMainTextStyle = TextStyle(
-    
       fontSize: 14.sp,
       fontWeight: FontWeight.bold,
       height: 2.5,
@@ -71,6 +72,7 @@ class _StudentProfileState extends State<StudentProfile>
     var r = await myFierstor.getRecordDocs(
         mEmail: widget.memorizerEmail, idn: widget.studentIDn);
     var result = List.generate(r.length, (index) => r.asMap());
+    // sortByDate( result);
     return r;
   }
 
@@ -87,7 +89,6 @@ class _StudentProfileState extends State<StudentProfile>
   //       .readData("SELECT * FROM tests WHERE id=${widget.studentSysID}");
   //   return result;
   // }
-
   _ageCalc(String birthday) {
     print(birthday);
 
@@ -128,15 +129,13 @@ class _StudentProfileState extends State<StudentProfile>
                       "عند حذف الطالب لن تتمكن من الوصول للبيانات القديمة وسيتم حذفها بشكل نهائي ",
                   confirmBtnText: "حذف",
                   confirmBtnColor: Colors.red,
-                  onConfirmBtnTap: () {myFierstor.deleteStudent(
-                      widget.memorizerEmail, widget.studentIDn);
+                  onConfirmBtnTap: () {
+                    myFierstor.deleteStudent(
+                        widget.memorizerEmail, widget.studentIDn);
                     // Navigator.pop(context);
-                     Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
-                      },
-                      
+                    Navigator.of(context).popUntil((route) => route.isFirst);
+                  },
                 );
-                  
               },
             ),
           ]),
@@ -156,7 +155,7 @@ class _StudentProfileState extends State<StudentProfile>
                         padding: const EdgeInsets.only(bottom: 20.0),
                         child: CircleAvatar(
                           radius: 50,
-                               child: Image.asset("assets/icon/person.png"),
+                          child: Image.asset("assets/icon/person.png"),
                         ),
                       ),
                       Text(
@@ -168,77 +167,88 @@ class _StudentProfileState extends State<StudentProfile>
                           style: TextStyle(
                               fontSize: dviceWidth * 0.067,
                               fontWeight: FontWeight.bold)),
-                      Row(
-                        children: [
-                          Container(
-                            width: (dviceWidth - 20) * 0.47,
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                      "رقم الهوية: " +
-                                          stdDate["IDn"].toString(),
-                                      style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          height: 2.5)),
-                                  Text(
-                                      "تاريخ الميلاد: " +
-                                          stdDate["DOB"].toString(),
-                                      textWidthBasis: TextWidthBasis.parent,
-                                      style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          height: 2.5)),
-                                  Text("المدرسة: " + stdDate["school"],
-                                      style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          height: 2.5)),
-                                ]),
-                          ),
-                          Container(
-                            width: dviceWidth * 0.48,
-                            child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  GestureDetector(
-                                    onTap: () async {
-                                      final Uri launchUri = Uri(
-                                        scheme: 'tel',
-                                        path: ' ${stdDate["phone"]}',
-                                      );
-                                      await launchUrl(launchUri);
-                                      // launchUrl('tel://${stdDate["phone"]}');
-                                    },
-                                    child: Text(
-                                      "رقم الجوال: " +
-                                          stdDate["phone"].toString(),
-                                      textWidthBasis: TextWidthBasis.parent,
-                                      style: TextStyle(
-                                          decoration: TextDecoration.underline,
-                                          fontSize: 14.sp,
-                                          color: Colors.blue,
-                                          fontWeight: FontWeight.bold,
-                                          height: 2.5),
+                      Container(
+                        width: dviceWidth - 11,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              margin: EdgeInsets.only(left: 5),
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                        "رقم الهوية: " +
+                                            stdDate["IDn"].toString(),
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            height: 2.5)),
+                                    Text(
+                                        "تاريخ الميلاد: " +
+                                            stdDate["DOB"].toString(),
+                                        textWidthBasis: TextWidthBasis.parent,
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            height: 2.5)),
+                                    Text("المدرسة: " + stdDate["school"],
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            height: 2.5)),
+                                  ]),
+                            ),
+                            SizedBox(
+                              width: (dviceWidth * 0.5) - 11,
+                              child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () async {
+                                        final Uri launchUri = Uri(
+                                          scheme: 'tel',
+                                          path: ' ${stdDate["phone"]}',
+                                        );
+                                        await launchUrl(launchUri);
+                                        // launchUrl('tel://${stdDate["phone"]}');
+                                      },
+                                      child: Flexible(
+                                        child: Container(
+                                          child: Text(
+                                            "رقم الجوال: " +
+                                                stdDate["phone"].toString(),
+                                            textWidthBasis:
+                                                TextWidthBasis.parent,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                                decoration:
+                                                    TextDecoration.underline,
+                                                fontSize: 14.sp,
+                                                color: Colors.blue,
+                                                fontWeight: FontWeight.bold,
+                                                height: 2.5),
+                                          ),
+                                        ),
+                                      ),
                                     ),
-                                  ),
-                                  Text(
-                                      "العمر: " +
-                                          _ageCalc(stdDate["DOB"].toString())
-                                              .toString(),
-                                      style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          height: 2.5)),
-                                  Text("الصف: " + stdDate["level"].toString(),
-                                      style: TextStyle(
-                                          fontSize: 14.sp,
-                                          fontWeight: FontWeight.bold,
-                                          height: 2.5))
-                                ]),
-                          )
-                        ],
+                                    Text(
+                                        "العمر: " +
+                                            _ageCalc(stdDate["DOB"].toString())
+                                                .toString(),
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            height: 2.5)),
+                                    Text("الصف: " + stdDate["level"].toString(),
+                                        style: TextStyle(
+                                            fontSize: 14.sp,
+                                            fontWeight: FontWeight.bold,
+                                            height: 2.5))
+                                  ]),
+                            )
+                          ],
+                        ),
                       ),
                       Divider(
                         color: Colors.black,
@@ -249,19 +259,18 @@ class _StudentProfileState extends State<StudentProfile>
                               fontSize: 27, fontWeight: FontWeight.bold)),
                       FutureBuilder(
                           future: _getStudentHistory(),
-                          builder: ((context,
-                              AsyncSnapshot<
-                                      List<QueryDocumentSnapshot<Object?>>>
-                                  snapshot) {
+                          builder: ((context, AsyncSnapshot snapshot) {
                             if (snapshot.hasData && snapshot.data!.length > 0) {
+                              List data = snapshot.data!;
+                              data.sort((a, b) => 
+                                  ((b['date'] as Timestamp).toDate()).compareTo(
+                                      ((a['date'] as Timestamp).toDate())));
                               return Flexible(
                                 child: ListView.builder(
                                     itemCount: snapshot.data?.length,
-                                    itemBuilder: (context, index) {
+                                    itemBuilder: (context, index) { 
                                       var recordData =
-                                          snapshot.data![index].data() as Map;
-                                      print("data");
-                                      print(recordData);
+                                          data[index].data() as Map;
                                       return Card(
                                         margin: EdgeInsets.all(6),
                                         child: Stack(
@@ -304,48 +313,42 @@ class _StudentProfileState extends State<StudentProfile>
                                                           MainAxisAlignment
                                                               .spaceBetween,
                                                       children: [
-                                                        Row(
-                                                          
-                                                          children: [
-                                                            Text("التاريخ : ",
-                                                                style:
-                                                                    cardMainTextStyle),
-                                                            Container(width: 100,height: 50,
-                                                              child: Text(
-                                                                  getRecordDate(
-                                                                      recordData[
-                                                                          'date']),softWrap: true,
-                                                                  style:
-                                                                      cardTextStyle),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          children: [
-                                                            Text("الإلتزام: ",
-                                                                style:
-                                                                    cardMainTextStyle),
-                                                            Text(
-                                                                recordData[
-                                                                        'commitment']
-                                                                    .toString(),
+                                                        Text("التاريخ:",
+                                                            style:
+                                                                cardMainTextStyle),
+                                                        Flexible(
+                                                          child: Container(
+                                                            width: 80,
+                                                            child: Text(
+                                                                getRecordDate(
+                                                                        recordData[
+                                                                            'date'])
+                                                                    .trim(),
+                                                                overflow:
+                                                                    TextOverflow
+                                                                        .ellipsis,
                                                                 style:
                                                                     cardTextStyle),
-                                                          ],
+                                                          ),
                                                         ),
-                                                        Row(
-                                                          children: [
-                                                            Text("  الجودة: ",
-                                                                style:
-                                                                    cardMainTextStyle),
-                                                            Text(
-                                                                recordData[
-                                                                        'quality']
-                                                                    .toString(),
-                                                                style:
-                                                                    cardTextStyle),
-                                                          ],
-                                                        ),
+                                                        Text("الإلتزام:",
+                                                            style:
+                                                                cardMainTextStyle),
+                                                        Text(
+                                                            recordData[
+                                                                    'commitment']
+                                                                .toString(),
+                                                            style:
+                                                                cardTextStyle),
+                                                        Text("الجودة:",
+                                                            style:
+                                                                cardMainTextStyle),
+                                                        Text(
+                                                            recordData[
+                                                                    'quality']
+                                                                .toString(),
+                                                            style:
+                                                                cardTextStyle),
                                                       ]),
                                                   Row(
                                                       mainAxisAlignment:

@@ -10,7 +10,7 @@ import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'package:tahfeez_app/moodle/HalaqaModel.dart';
 import 'package:tahfeez_app/moodle/Student.dart';
-import 'sqfDB.dart';
+// import 'sqfDB.dart';
 import 'package:intl/intl.dart' as intl;
 
 class AddStudent extends StatefulWidget {
@@ -165,10 +165,7 @@ class _AddStudentState extends State<AddStudent>
                       SizedBox(
                         height: 20,
                       ),
-                      CircleAvatar(backgroundColor: Colors.green,
-                        radius: 50,
-                        backgroundImage: AssetImage("assets/icon/logo.png"),
-                      ),
+                      Image.asset("assets/icon/logo.png",width: 100),
                       SizedBox(
                         height: 20,
                       ),
@@ -380,6 +377,7 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
+                              keyboardType: TextInputType.number,
                               textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)

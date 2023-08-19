@@ -5,7 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'Student.dart';
 import 'package:intl/intl.dart' as intl;
-import 'package:tahfeez_app/sqfDB.dart';
+// import 'package:tahfeez_app/sqfDB.dart';
 
 class Record {
   String? id, stdID, surah, date, type, isSynced, from, to, memorizerEmail;

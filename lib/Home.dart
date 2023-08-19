@@ -25,7 +25,7 @@ import 'package:tahfeez_app/moodle/bug-report-overlay.dart';
 import 'package:tahfeez_app/moodle/Student.dart';
 import 'package:tahfeez_app/services/MapStyle.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'sqfDB.dart';
+// import 'sqfDB.dart';
 import 'package:tahfeez_app/moodle/WhatsappMassage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -61,27 +61,27 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
   //   // exportToExcel(result, "AllStdAttendance.xlsx");
   // }
 
-  sortList(List<Map> list) {
-    List<Map> _list = list.toList();
-    List<Map> sorted = [];
-    Map _max = {};
-    for (var i = 0; i < list.length; i++) {
-      _max = _list[0];
-      for (var j = 0; j < _list.length; j++) {
-        _max = max(_max, _list[j]);
-      }
+  // sortList(List<Map> list) {
+  //   List<Map> _list = list.toList();
+  //   List<Map> sorted = [];
+  //   Map _max = {};
+  //   for (var i = 0; i < list.length; i++) {
+  //     _max = _list[0];
+  //     for (var j = 0; j < _list.length; j++) {
+  //       _max = max(_max, _list[j]);
+  //     }
 
-      _list.removeWhere((element) {
-        return element['id'] == _max['id'];
-        // if (t == 0) {
-        //   return true;
-        // } else
-        //   return false;
-      });
-      sorted.add(_max);
-    }
-    return sorted;
-  }
+  //     _list.removeWhere((element) {
+  //       return element['id'] == _max['id'];
+  //       // if (t == 0) {
+  //       //   return true;
+  //       // } else
+  //       //   return false;
+  //     });
+  //     sorted.add(_max);
+  //   }
+  //   return sorted;
+  // }
 
   max(a, b) {
     if (double.parse(a['points']) >= double.parse(b['points']))
@@ -1121,81 +1121,90 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                         var stdData = data!.elementAt(index);
                         // getFirestoreDataAsListWithID(
                         //     stdData, snapshot.data!.elementAt(index).id);
-                        return Card(
-                          margin: EdgeInsets.all(6),
-                          child: Padding(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 15),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Row(children: [
-                                  Container(
-                                    width: 35,
-                                    padding: EdgeInsets.all(0),
-                                    margin: EdgeInsets.all(0),
-                                    child: GestureDetector(
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(MaterialPageRoute(
+                                builder: (context) => StudentProfile(
+                                      studentIDn: stdData['IDn'],
+                                      memorizerEmail: memorizerEmail,
+                                    )));
+                          },
+                          child: Card(
+                            margin: EdgeInsets.all(6),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 15),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(children: [
+                                    Container(
+                                      width: 35,
+                                      padding: EdgeInsets.all(0),
+                                      margin: EdgeInsets.all(0),
+                                      // child: GestureDetector(
                                       child: CircleAvatar(
                                         radius: 20,
                                         child: Image.asset(
+                                          height: 25,
                                           "assets/icon/person.png",
                                         ),
                                       ),
-                                      onTap: () {
-                                        // db.insertData(
-                                        //     "INSERT INTO 'Records' (std_id, surah, date, frm, t, quality) VALUES ( '${stdData['id']}' , 'amma' , 20/10/2022 , 1 , 20)");
-                                        Navigator.of(context).push(
-                                            MaterialPageRoute(
-                                                builder: (context) =>
-                                                    StudentProfile(
-                                                      studentIDn:
-                                                          stdData['IDn'],
+                                      // onTap: () {
+                                      //   Navigator.of(context).push(
+                                      //       MaterialPageRoute(
+                                      //           builder: (context) =>
+                                      //               StudentProfile(
+                                      //                 studentIDn:
+                                      //                     stdData['IDn'],
+                                      //                 memorizerEmail:
+                                      //                     memorizerEmail,
+                                      //               )));
+                                      // },
+                                      // ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10),
+                                      child: Column(
+                                        children: [
+                                          Text(stdData['f_name'].toString() +
+                                              " " +
+                                              stdData['l_name'].toString()),
+                                          // Text((stdData['points'] +
+                                          //         stdData['attendance'])
+                                          //     .toString())
+                                          Text((stdData['points']).toString())
+                                        ],
+                                      ),
+                                    )
+                                  ]),
+                                  CircleAvatar(
+                                    backgroundColor: Colors.green,
+                                    child: IconButton(
+                                      icon: Icon(
+                                        Icons.add,
+                                        color: Colors.white,
+                                      ),
+                                      onPressed: () async {
+                                        print("object");
+                                        print(await stdData['IDn']);
+                                        Navigator.push(
+                                            context,
+                                            await MaterialPageRoute(
+                                                builder: (context) => NewRecord(
+                                                      stdID: stdData['IDn'],
                                                       memorizerEmail:
                                                           memorizerEmail,
+                                                      stdName:
+                                                          """${stdData['f_name']} ${stdData['l_name']}""",
                                                     )));
                                       },
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 10),
-                                    child: Column(
-                                      children: [
-                                        Text(stdData['f_name'].toString() +
-                                            " " +
-                                            stdData['l_name'].toString()),
-                                        // Text((stdData['points'] +
-                                        //         stdData['attendance'])
-                                        //     .toString())
-                                        Text((stdData['points']).toString())
-                                      ],
-                                    ),
                                   )
-                                ]),
-                                CircleAvatar(
-                                  backgroundColor: Colors.green,
-                                  child: IconButton(
-                                    icon: Icon(
-                                      Icons.add,
-                                      color: Colors.white,
-                                    ),
-                                    onPressed: () async {
-                                      print("object");
-                                      print(await stdData['IDn']);
-                                      Navigator.push(
-                                          context,
-                                          await MaterialPageRoute(
-                                              builder: (context) => NewRecord(
-                                                    stdID: stdData['IDn'],
-                                                    memorizerEmail:
-                                                        memorizerEmail,
-                                                    stdName:
-                                                        """${stdData['f_name']} ${stdData['l_name']}""",
-                                                  )));
-                                    },
-                                  ),
-                                )
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         );

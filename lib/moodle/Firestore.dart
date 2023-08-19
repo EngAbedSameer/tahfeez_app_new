@@ -7,7 +7,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:tahfeez_app/services/MapStyle.dart';
-import 'package:tahfeez_app/sqfDB.dart';
+// import 'package:tahfeez_app/sqfDB.dart';
 
 class Firestore {
 //  static Firestore? _instance;
