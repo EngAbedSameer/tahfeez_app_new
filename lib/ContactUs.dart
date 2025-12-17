@@ -70,11 +70,11 @@ void captureUserFeedback(String name, String comments) {
       name: $name,
       email: ${widget.userEmail},
 ''');
-    Sentry.captureUserFeedback(SentryUserFeedback(
-      eventId: eventId,
-      comments: comments,
+    Sentry.captureFeedback(SentryFeedback(
+      associatedEventId: eventId,
+      message: comments,
       name: name,
-      email: widget.userEmail,
+      contactEmail: widget.userEmail,
     ));
     notifyListeners();
   }

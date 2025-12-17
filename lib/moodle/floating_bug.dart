@@ -26,11 +26,11 @@ class FloatingBugReportProvider extends ChangeNotifier {
   }
 
   void captureUserFeedback(String name, String comments) {
-    Sentry.captureUserFeedback(SentryUserFeedback(
-      eventId: _eventId,
-      comments: comments,
+    Sentry.captureFeedback(SentryFeedback(
+      associatedEventId: _eventId,
+      message: comments,
       name: name,
-      email: _userEmail,
+      contactEmail: _userEmail,
     ));
     notifyListeners();
   }

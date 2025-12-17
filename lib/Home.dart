@@ -199,79 +199,79 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
         if (j == 0) {
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
-              .value = list[row]['f_name'].toString();
+              .value = TextCellValue(list[row]['f_name'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
-              .value = list[row]['m_name'].toString();
+              .value = TextCellValue( list[row]['m_name'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
-              .value = list[row]['l_name'].toString();
+              .value = TextCellValue(list[row]['l_name'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
-              .value = list[row]['IDn'].toString();
+              .value = TextCellValue(list[row]['IDn'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
-              .value = list[row]['DOB'].toString();
+              .value = TextCellValue(list[row]['DOB'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
-              .value = list[row]['phone'].toString();
+              .value = TextCellValue(list[row]['phone'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
-              .value = list[row]['school'].toString();
+              .value = TextCellValue(list[row]['school'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
-              .value = list[row]['level'].toString();
+              .value = TextCellValue(list[row]['level'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
-              .value = list[row]['attendance'].toString();
+              .value = TextCellValue(list[row]['attendance'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 9, rowIndex: row))
-              .value = list[row]['points'].toString();
+              .value = TextCellValue(list[row]['points'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 10, rowIndex: row))
-              .value = list[row]['lastTest'].toString();
+              .value = TextCellValue(list[row]['lastTest'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 11, rowIndex: row))
-              .value = list[row]['lastTestDegree'].toString();
+              .value = TextCellValue(list[row]['lastTestDegree'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 12, rowIndex: row))
-              .value = list[row]['last_update'].toString();
+              .value = TextCellValue(list[row]['last_update'].toString());
         } else if (j == 1) {
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 0, rowIndex: row))
-              .value = list[row]['IDn'].toString();
+              .value = TextCellValue(list[row]['IDn'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 1, rowIndex: row))
-              .value = list[row]['surah'].toString();
+              .value = TextCellValue(list[row]['surah'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 2, rowIndex: row))
-              .value = list[row]['from'].toString();
+              .value = TextCellValue(list[row]['from'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 3, rowIndex: row))
-              .value = list[row]['to'].toString();
+              .value = TextCellValue(list[row]['to'].toString());
           if (list[row]['date'].runtimeType == Timestamp) {
             var s = list[row]['date'] as Timestamp;
             print(s.toDate().toString() + " 1111111111");
             sheet
                 .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
-                .value = s.toDate().toString();
+                .value = TextCellValue(s.toDate().toString());
           } else {
             sheet
                 .cell(CellIndex.indexByColumnRow(columnIndex: 4, rowIndex: row))
-                .value = list[row]['date'].toString();
+                .value = TextCellValue(list[row]['date'].toString());
           }
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 5, rowIndex: row))
-              .value = list[row]['quality'].toString();
+              .value = TextCellValue(list[row]['quality'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 6, rowIndex: row))
-              .value = list[row]['pgsCount'].toString();
+              .value = TextCellValue(list[row]['pgsCount'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 7, rowIndex: row))
-              .value = list[row]['commitment'].toString();
+              .value = TextCellValue(list[row]['commitment'].toString());
           sheet
               .cell(CellIndex.indexByColumnRow(columnIndex: 8, rowIndex: row))
-              .value = (list[row]['type'].toString() == '1') ? "مراجعة" : "حفظ";
+              .value = TextCellValue((list[row]['type'].toString() == '1') ? "مراجعة" : "حفظ");
         }
 
 //         print('''

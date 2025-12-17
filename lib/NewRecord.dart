@@ -352,13 +352,13 @@ class _NewRecordState extends State<NewRecord>
                                     textInputAction: TextInputAction.next,
                                     autoCorrect: true,
                                     hint: 'اختر اسم السورة',
-                                    searchInputDecoration: InputDecoration(
+                                    searchInputDecoration: SearchInputDecoration(
                                         enabledBorder: OutlineInputBorder(
                                             borderSide: BorderSide(
                                                 color: Colors.green))),
                                     itemHeight: 50,
                                     maxSuggestionsInViewPort: 6,
-                                    suggestionsDecoration: BoxDecoration(
+                                    suggestionsDecoration: SuggestionDecoration(
                                         color: Colors.white,
                                         borderRadius:
                                             BorderRadius.circular(10)),
