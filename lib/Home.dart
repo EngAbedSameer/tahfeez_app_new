@@ -1065,7 +1065,7 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
           mEmail: memorizerEmail);
       result = std.map((e) => e.data() as Map<String, dynamic>).toList();
     }
-    return result! as List<Map<String, dynamic>>;
+    return result as List<Map<String, dynamic>>;
   }
 
   var memorizerEmail;
@@ -1116,9 +1116,9 @@ class _HomeState extends State<Home> with SingleTickerProviderStateMixin {
                   data = data.reversed.toList();
                   // var data = sortList(snapshot.data!);
                   return ListView.builder(
-                      itemCount: data?.length,
+                      itemCount: data.length,
                       itemBuilder: (context, index) {
-                        var stdData = data!.elementAt(index);
+                        var stdData = data.elementAt(index);
                         // getFirestoreDataAsListWithID(
                         //     stdData, snapshot.data!.elementAt(index).id);
                         return GestureDetector(
