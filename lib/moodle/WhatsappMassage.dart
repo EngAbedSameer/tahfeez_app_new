@@ -2,7 +2,6 @@
 // import 'package:permission_handler/permission_handler.dart';
 // ignore_for_file: deprecated_member_use, curly_braces_in_flow_control_structures
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tahfeez_app/services/MapStyle.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:intl/intl.dart' as intl;
 import 'Firestore.dart';

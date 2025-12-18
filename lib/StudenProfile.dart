@@ -1,14 +1,9 @@
 // ignore_for_file: avoid_print, prefer_typing_uninitialized_variables, implementation_imports, curly_braces_in_flow_control_structures, unused_element
-import 'dart:ffi';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:intl/intl.dart';
 import 'package:age_calculator/age_calculator.dart';
 import 'package:flutter/material.dart';
 // import 'package:flutter/src/animation/animation_controller.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/ticker_provider.dart';
 // import 'package:tahfeez_app/NewRecord.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:quickalert/quickalert.dart';

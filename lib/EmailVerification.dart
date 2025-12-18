@@ -2,8 +2,6 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:tahfeez_app/Home.dart';
-import 'package:tahfeez_app/UserSignupData.dart';
-import 'package:tahfeez_app/Login.dart';
 
 class EmailVerification extends StatefulWidget {
   final String memorizerEmail;

@@ -1,21 +1,13 @@
 // import 'package:intl/intl.dart' as intl;
 // ignore_for_file: avoid_print, implementation_imports, prefer_typing_uninitialized_variables, sort_child_properties_last, file_names
 
-import 'dart:io';
 import 'dart:math';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
-import 'package:flutter/src/widgets/ticker_provider.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:searchfield/searchfield.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
-import 'package:tahfeez_app/moodle/Record.dart';
 // import 'sqfDB.dart';
-import 'package:intl/intl.dart' as intl;
 
 class NewRecord extends StatefulWidget {
   final String stdID;

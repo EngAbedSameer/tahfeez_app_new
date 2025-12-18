@@ -1,10 +1,6 @@
-import 'dart:math';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 import 'Student.dart';
-import 'package:intl/intl.dart' as intl;
 // import 'package:tahfeez_app/sqfDB.dart';
 
 class Record {

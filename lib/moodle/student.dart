@@ -1,4 +1,3 @@
-import 'package:tahfeez_app/AddStudent.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
 // import 'package:tahfeez_app/sqfDB.dart';
 

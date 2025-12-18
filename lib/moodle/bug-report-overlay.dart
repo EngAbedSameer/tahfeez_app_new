@@ -3,8 +3,6 @@ import 'package:provider/provider.dart';
 import 'floating_bug.dart';
 import 'package:flutter/material.dart';
 // import 'package:provider/provider.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:tahfeez_app/moodle/floating_bug.dart';
 
 class BugReportOverlay extends StatefulWidget with ChangeNotifier {
   BugReportOverlay({Key? key}) : super(key: key);

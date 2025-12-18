@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:tahfeez_app/moodle/floating_bug.dart';
 import "package:sentry/sentry.dart";
 class ContactUs extends StatefulWidget {
 

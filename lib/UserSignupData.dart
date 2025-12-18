@@ -131,7 +131,7 @@ class _UserSignupDataState extends State<UserSignupData> {
                                   if (value == null || value.isEmpty) {
                                     print(" ******************* ");
                                     return 'يجب تعبئة هذه الخانة';
-                                  } else if (value!.length != 13) {
+                                  } else if (value.length != 13) {
                                     print(value.length);
                                     return 'رقم الجوال غير صحيح';
                                   }

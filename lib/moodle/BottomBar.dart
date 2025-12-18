@@ -3,7 +3,6 @@
 import 'package:flutter/material.dart';
 import 'package:tahfeez_app/AddStudent.dart';
 // import 'package:tahfeez_app/Home.dart';
-import 'package:tahfeez_app/daeily.dart';
 
 class BottomBar extends StatefulWidget {
   final bool home;

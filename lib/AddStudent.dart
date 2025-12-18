@@ -8,7 +8,6 @@ import 'package:flutter/src/widgets/ticker_provider.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:tahfeez_app/moodle/BottomBar.dart';
 import 'package:tahfeez_app/moodle/Firestore.dart';
-import 'package:tahfeez_app/moodle/HalaqaModel.dart';
 import 'package:tahfeez_app/moodle/Student.dart';
 // import 'sqfDB.dart';
 import 'package:intl/intl.dart' as intl;
