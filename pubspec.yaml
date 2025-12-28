@@ -55,6 +55,9 @@ dependencies:
   sentry_flutter: ^9.9.0
   flutter_launcher_icons: ^0.14.4
   firebase_storage: ^13.0.5
+  google_sign_in: ^6.2.1
+  get: ^4.7.3
+  shared_preferences: ^2.5.4
 
   
 dev_dependencies:
