@@ -21,20 +21,19 @@ import 'package:tahfeez_app/services/shared_preferences.dart';
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
   // late AnimationController _controller;
-  final _formKey = GlobalKey<FormState>();
-  final Firestore myFirestore = Firestore();
-  final _emailController = TextEditingController();
-  final _passwordController = TextEditingController();
-  final _repasswordController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _centerController = TextEditingController();
-  final _cityController = TextEditingController();
-  final _nameController = TextEditingController();
+  // final _formKey = GlobalKey<FormState>();
+  // final Firestore myFirestore = Firestore();
+  // final _emailController = TextEditingController();
+  // final _passwordController = TextEditingController();
+  // final _repasswordController = TextEditingController();
+  // final _phoneController = TextEditingController();
+  // final _centerController = TextEditingController();
+  // final _cityController = TextEditingController();
+  // final _nameController = TextEditingController();
   // SqlDb db = SqlDb();
-  dynamic singup = false;
-  bool _showPassword = false;
-  bool _showRePassword = false;
-
+  // dynamic singup = false;
+  // bool _showPassword = false;
+  // bool _showRePassword = false;
   // _signUp(email, password) async {
   //   try {
   //     await FirebaseAuth.instance
@@ -59,7 +58,6 @@ class LoginScreen extends StatelessWidget {
   //   // if(remember)_activeRemember(email, password);
   //   return true;
   // }
-
   // Future<bool> _auth(email, password, context) async {
   //   try {
   //     await FirebaseAuth.instance
@@ -93,7 +91,6 @@ class LoginScreen extends StatelessWidget {
   //   }
   //   // if(remember)_activeRemember(email, password);
   // }
-
   // _isRemembered() async {
   //   List<Map> loginData = await db.readData("select * from Login");
   //   // print(loginData.first.entries.last.value.toString());
@@ -118,26 +115,19 @@ class LoginScreen extends StatelessWidget {
   //     await db.insertData("INSERT INTO 'Login' (email, password, remember) VALUES ('$email' , '$password' , 'true') ");
   //   else
   //     await db.updateData("UPDATE 'Login' SET email='$email',password='$password',remember= 'true' ");
-
   // }
-  _togglePassvisibility(field) {
-    field == 'password'
-        ? _showPassword = !_showPassword
-        : _showRePassword = !_showRePassword;
-  }
-
-  var isLogin = false;
 
   @override
   Widget build(BuildContext context) {
     return GetBuilder<LoginController>(initState: (state) {
       FirebaseAuth.instance.authStateChanges().listen((User? user) async {
         if (user == null) {
-          isLogin = false;
+          state.controller!.isLogin = false;
         } else {
-          isLogin = await state.controller!.checkUserInFirestore(user.email);
-          log('login screen checkUserInFirestore result: $isLogin');
-          if (isLogin == false) {
+          state.controller!.isLogin =
+              await state.controller!.checkUserInFirestore(user.email);
+          log('login screen checkUserInFirestore result: $state.controller!.isLogin');
+          if (state.controller!.isLogin == false) {
             // log("Halaqa found for email: ${user.email} => go to home screen");
             Get.to(() => UserSignupDataScreen(
                   memorizerEmail: user.email.toString(),
@@ -148,31 +138,27 @@ class LoginScreen extends StatelessWidget {
         }
       });
     }, builder: (controller) {
-      if (!isLogin) {
-        return StreamBuilder(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshots) {
-              // if (snapshots.hasData && !snapshots.data!.emailVerified) {
-              //   print('Email not ver ${snapshots.data!.email}');
-              //   return EmailVerification(
-              //     memorizerEmail: snapshots.data!.email.toString(),
-              //     signUp: singup,
-              //   );
-              // } else {
-              return Scaffold(body: _newbuild());
-            });
-      } else {
-        return StreamBuilder(
-            stream: FirebaseAuth.instance.authStateChanges(),
-            builder: (context, snapshots) {
+      return StreamBuilder(
+          stream: FirebaseAuth.instance.authStateChanges(),
+          builder: (context, snapshots) {
+            // if (snapshots.hasData && !snapshots.data!.emailVerified) {
+            //   print('Email not ver ${snapshots.data!.email}');
+            //   return EmailVerification(
+            //     memorizerEmail: snapshots.data!.email.toString(),
+            //     signUp: singup,
+            //   );
+            // } else {
+            if (!controller.isLogin) {
+              return Scaffold(body: _buildt());
+            } else {
               return snapshots.hasData
                   ? EmailVerification(
                       memorizerEmail: snapshots.data!.email.toString(),
-                      signUp: singup,
+                      signUp: controller.singup,
                     )
                   : Text("Error in login process");
-            });
-      }
+            }
+          });
     });
   }
 
@@ -386,148 +372,232 @@ class LoginScreen extends StatelessWidget {
   //   );
   //   // }
   // }
-  bool _isSignUp = false;
+
   Widget _newbuild() {
-    return GetBuilder<LoginController>(
-        initState: (state) {},
-        builder: (controller) {
-          return SizedBox(
-            height: 800,
-            child: Stack(
-              children: [
-                Image.asset(
-                  'assets/images/login.jpg',
-                  width: double.infinity,
+    return GetBuilder<LoginController>(builder: (controller) {
+      return SizedBox(
+        height: 800,
+        child: Stack(
+          children: [
+            Image.asset(
+              'assets/images/login.jpg',
+              width: double.infinity,
+            ),
+            Positioned(
+              top: 240,
+              child: Container(
+                width: 360,
+                height: 565,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(30),
+                  color: Color(0xffffffff),
                 ),
-                Positioned(
-                  top: 240,
-                  child: Container(
-                    width: 360,
-                    height: 565,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(30),
-                      color: Color(0xffffffff),
-                    ),
-                    padding: EdgeInsets.all(20),
-                    child: SingleChildScrollView(
-                      child: Column(
-                        children: [
-                          Text(
-                            _isSignUp ? 'Signup' : 'Login',
-                            style: TextStyle(
-                                fontSize: 28, fontWeight: FontWeight.bold),
-                          ),
-                          MyTextFieldWithLabel(
-                              textInputAction: TextInputAction.next,
-                              controller: controller.emailController,
-                              label: 'Email',
-                              icon: Icons.email_outlined,
-                              hint: 'example@my.com'),
-                          MyTextFieldWithLabel(
-                              textInputAction: TextInputAction.done,
-                              controller: controller.passwordController,
-                              label: 'Password',
+                padding: EdgeInsets.all(20),
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      Text(
+                        controller.isSignUp ? 'Signup' : 'Login',
+                        style: TextStyle(
+                            fontSize: 28, fontWeight: FontWeight.bold),
+                      ),
+                      MyTextFieldWithLabel(
+                          textInputAction: TextInputAction.next,
+                          controller: controller.emailController,
+                          label: 'Email',
+                          icon: Icons.email_outlined,
+                          hint: 'example@my.com'),
+                      MyTextFieldWithLabel(
+                          textInputAction: TextInputAction.done,
+                          controller: controller.passwordController,
+                          label: 'Password',
+                          icon: Icons.lock,
+                          hint: '********'),
+                      controller.isSignUp
+                          ? MyTextFieldWithLabel(
+                              label: 'Re-Password',
                               icon: Icons.lock,
-                              hint: '********'),
-                          _isSignUp
-                              ? MyTextFieldWithLabel(
-                                  label: 'Re-Password',
-                                  icon: Icons.lock,
-                                  hint: '********')
-                              : SizedBox(),
-                          MyFillWidthButton(
-                            label: 'login',
-                            onPressed: () {
-                              _isSignUp
-                                  ? controller.signUp().then((value) {
-                                      if (value) {
-                                        log(
-                                            'Signup successful for email: ${controller.emailController.text}');
-                                        MySharedPreferences().setBool(
-                                            PreferencesNames.check_login
-                                                .toString(),
-                                            true);
-                                      } else {
-                                        log(
-                                            'Signup failed for email: ${controller.emailController.text}');
-                                      }
-                                    })
-                                  :
-                              controller.login().then((value) {
-                                if (value) {
-                                  log('Login successful for email: ${controller.emailController.text}');
-                                  MySharedPreferences().setBool(
-                                      PreferencesNames.check_login.toString(),
-                                      true);
-                                } else {
-                                  log('Login failed for email: ${controller.emailController.text}');
-                                }
-                              });
-                            },
-                          ),
-                          SizedBox(
-                            height: 10,
-                          ),
-                          Text.rich(TextSpan(
-                              text: "Don't have an account? ",
-                              children: [
-                                TextSpan(
-                                    text: _isSignUp ? 'Login' : 'Signup',
-                                    style: TextStyle(color: Colors.green),
-                                    recognizer: TapGestureRecognizer()
-                                      ..onTap = () {
-                                        // state.
-                                        log('tapped signup/login');
-                                        _isSignUp = true;
-                                        controller.update();
-                                      }),
-                              ])),
-                          SizedBox(
-                            height: 8,
-                          ),
-                          Text(
-                            'OR',
-                            style: TextStyle(
-                                fontSize: 22, color: Colors.grey[400]),
-                          ),
-                          GestureDetector(
-                            onTap: () {
-                              controller.googleLogin();
-                            },
-                            child: ClipRRect(
-                              // borderRadius: BorderRadius.circular(13),
-                              child: BackdropFilter(
-                                filter:
-                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                                child: Container(
-                                  width: 65,
-                                  height: 65,
-                                  decoration: BoxDecoration(
-                                      border: Border.all(
-                                          width: 1.2,
-                                          color: Colors.grey
-                                              .withValues(alpha: 0.1)),
-                                      borderRadius: BorderRadius.circular(15),
+                              hint: '********')
+                          : SizedBox(),
+                      MyFillWidthButton(
+                        label: 'login',
+                        onPressed: () {
+                          controller.isSignUp
+                              ? controller.signUp().then((value) {
+                                  if (value) {
+                                    log('Signup successful for email: ${controller.emailController.text}');
+                                    MySharedPreferences().setBool(
+                                        PreferencesNames.check_login.toString(),
+                                        true);
+                                  } else {
+                                    log('Signup failed for email: ${controller.emailController.text}');
+                                  }
+                                })
+                              : controller.login().then((value) {
+                                  if (value) {
+                                    log('Login successful for email: ${controller.emailController.text}');
+                                    MySharedPreferences().setBool(
+                                        PreferencesNames.check_login.toString(),
+                                        true);
+                                  } else {
+                                    log('Login failed for email: ${controller.emailController.text}');
+                                  }
+                                });
+                        },
+                      ),
+                      SizedBox(
+                        height: 10,
+                      ),
+                      Text.rich(
+                          TextSpan(text: "Don't have an account? ", children: [
+                        TextSpan(
+                            text: controller.isSignUp ? 'Login' : 'Signup',
+                            style: TextStyle(color: Colors.green),
+                            recognizer: TapGestureRecognizer()
+                              ..onTap = () {
+                                // state.
+                                log('tapped signup/login');
+                                controller.isSignUp = true;
+                                controller.update();
+                              }),
+                      ])),
+                      SizedBox(
+                        height: 8,
+                      ),
+                      Text(
+                        'OR',
+                        style: TextStyle(fontSize: 22, color: Colors.grey[400]),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          controller.googleLogin();
+                        },
+                        child: ClipRRect(
+                          // borderRadius: BorderRadius.circular(13),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                            child: Container(
+                              width: 65,
+                              height: 65,
+                              decoration: BoxDecoration(
+                                  border: Border.all(
+                                      width: 1.2,
                                       color:
-                                          Colors.grey.withValues(alpha: 0.05)),
-                                  padding: EdgeInsets.all(12),
-                                  margin: EdgeInsets.all(15),
-                                  child: Image.asset(
-                                    'assets/images/google.png',
-                                    width: 32,
-                                  ),
-                                ),
+                                          Colors.grey.withValues(alpha: 0.1)),
+                                  borderRadius: BorderRadius.circular(15),
+                                  color: Colors.grey.withValues(alpha: 0.05)),
+                              padding: EdgeInsets.all(12),
+                              margin: EdgeInsets.all(15),
+                              child: Image.asset(
+                                'assets/images/google.png',
+                                width: 32,
                               ),
                             ),
-                          )
-                        ],
-                      ),
-                    ),
+                          ),
+                        ),
+                      )
+                    ],
                   ),
-                )
+                ),
+              ),
+            )
+          ],
+        ),
+      );
+    });
+  }
+
+  Widget _buildt() {
+    return Directionality(
+      textDirection: TextDirection.rtl,
+      child: Scaffold(
+        body: Stack(
+          children: [
+            // Gradient
+            Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [
+                    Color(0xFFF7FAFF),
+                    Color(0xFFEAF2FF),
+                    Color(0xFFD6E6FF),
+                  ],
+                ),
+              ),
+            ),
+
+            // Blurred shapes
+            Align(
+              alignment: Alignment.topLeft,
+              child: Container(
+                width: 220,
+                height: 220,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.2),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+
+            Align(
+              alignment: Alignment.bottomRight,
+              child: Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  color: Colors.blue.withOpacity(0.18),
+                  shape: BoxShape.circle,
+                ),
+              ),
+            ),
+
+            BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
+              child: Container(color: Colors.transparent),
+            ),
+
+            // Content
+            Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Center(
+                  child: Image.asset("assets/icon/logo.png", width: 200),
+                ),
+                Text('توشين الردم',
+                    style: TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87)),
+                Text('تطبيق خاص لمتابعة تدشين الردم'),
+                MyTextFieldWithLabel(
+                    label: 'اسم المستخدم',
+                    icon: Icons.person_outline_rounded,
+                    hint: '13245',
+                    filled: true,
+                    borderColor: Colors.white),
+                MyTextFieldWithLabel(
+                    label: 'كلمة المرور',
+                    icon: Icons.lock_outline_rounded,
+                    hint: '123456789',
+                    filled: true,
+                    borderColor: Colors.white),
+                Align(
+                    alignment: Alignment.centerRight,
+                    child: TextButton(
+                      onPressed: () {},
+                      child: Text('نسيت كلمة المرور؟'),
+                    )),
+                MyFillWidthButton(
+                  label: 'تسجيل الدخول',
+                  onPressed: () {},
+                ),
               ],
             ),
-          );
-        });
+          ],
+        ),
+      ),
+    );
   }
 }

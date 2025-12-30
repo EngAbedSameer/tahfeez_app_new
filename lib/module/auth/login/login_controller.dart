@@ -15,6 +15,11 @@ class LoginController extends GetxController {
 
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  bool _showPassword = false;
+  var isLogin = false;
+  dynamic singup = false;
+  bool isSignUp = false;
+  // bool _showRePassword = false;
   @override
   void onInit() async {
     super.onInit();
@@ -59,10 +64,8 @@ class LoginController extends GetxController {
       }
     } on FirebaseAuthException catch (e) {
       log(e.toString());
-          QuickAlert.show(
-          context: Get.context!,
-          type: QuickAlertType.error,
-          title: "$e");
+      QuickAlert.show(
+          context: Get.context!, type: QuickAlertType.error, title: "$e");
     }
   }
 
@@ -201,5 +204,9 @@ class LoginController extends GetxController {
       log("No Halaqa found for email: $email => go to singup data completion");
       return false;
     }
+  }
+
+  _togglePassvisibility(field) {
+    _showPassword = !_showPassword;
   }
 }
