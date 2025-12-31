@@ -4,9 +4,9 @@ enum PreferencesNames {
   check_login,
   check_account_auth,
   check_account_data_completed,
-  check_onboarding_completed,
   check_email_verified,
-  check_halaqa_created
+  check_halaqa_created,
+  email
 }
 
 class MySharedPreferences {
@@ -49,5 +49,21 @@ class MySharedPreferences {
 
   bool? getBool(String key) {
     return _preferences?.getBool(key);
+  }
+
+  static Future<void> logout() async {
+    // final prefs = await SharedPreferences.getInstance();
+    // await prefs.clear();
+
+    MySharedPreferences()
+        .setBool(PreferencesNames.check_account_auth.name, false);
+    MySharedPreferences()
+        .setBool(PreferencesNames.check_account_data_completed.name, false);
+    MySharedPreferences()
+        .setBool(PreferencesNames.check_email_verified.name, false);
+    MySharedPreferences()
+        .setBool(PreferencesNames.check_halaqa_created.name, false);
+    MySharedPreferences().setBool(PreferencesNames.check_login.name, false);
+
   }
 }

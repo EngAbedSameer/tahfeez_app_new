@@ -3,19 +3,15 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:get/get_navigation/src/extension_navigation.dart';
 import 'package:get/state_manager.dart';
-import 'package:quickalert/quickalert.dart';
 import 'package:tahfeez_app/Widgets/my_fill_width_button.dart';
 import 'package:tahfeez_app/Widgets/my_text_field_with_label.dart';
 import 'package:tahfeez_app/module/auth/email_verification/email_verification_screen.dart';
 import 'package:tahfeez_app/module/auth/login/login_controller.dart';
-import 'package:tahfeez_app/module/home/home_screen.dart';
-import 'package:tahfeez_app/module/auth/signup/user_signup_data/user_signup_data_screen.dart';
-import 'package:tahfeez_app/model/Firestore.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:tahfeez_app/module/auth/signup/user_signup_data/user_signup_data_screen.dart';
+import 'package:tahfeez_app/module/home/home_screen.dart';
 import 'package:tahfeez_app/services/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -119,44 +115,65 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GetBuilder<LoginController>(initState: (state) {
-      FirebaseAuth.instance.authStateChanges().listen((User? user) async {
-        if (user == null) {
-          state.controller!.isLogin = false;
-        } else {
-          state.controller!.isLogin =
-              await state.controller!.checkUserInFirestore(user.email);
-          log('login screen checkUserInFirestore result: $state.controller!.isLogin');
-          if (state.controller!.isLogin == false) {
-            // log("Halaqa found for email: ${user.email} => go to home screen");
-            Get.to(() => UserSignupDataScreen(
-                  memorizerEmail: user.email.toString(),
-                  password: '',
-                ));
-            //  isLogin = true;
-          }
-        }
-      });
-    }, builder: (controller) {
+    return GetBuilder<LoginController>(
+        // initState: (state) async {
+        //   await FirebaseAuth.instance.authStateChanges().listen((User? user) async {
+        //     if (user == null) {
+        //       state.controller!.isLogin = false;
+        //     } else {
+        //       state.controller!.isLogin =
+        //           await state.controller!.checkUserInFirestore(user.email);
+        //       log('login screen checkUserInFirestore result: ${state.controller!.isLogin}');
+        //       if (state.controller!.isLogin == false) {
+        //         // log("Halaqa found for email: ${user.email} => go to home screen");
+        //         Get.to(() => UserSignupDataScreen(
+        //               memorizerEmail: user.email.toString(),
+        //               password: '',
+        //             ));
+        //         //  isLogin = true;
+        //       } else {
+        //         state.controller!.isLogin = true;
+        //       }
+        //     }
+        //   });
+        // },
+        builder: (controller) {
       return StreamBuilder(
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshots) {
-            // if (snapshots.hasData && !snapshots.data!.emailVerified) {
-            //   print('Email not ver ${snapshots.data!.email}');
-            //   return EmailVerification(
-            //     memorizerEmail: snapshots.data!.email.toString(),
-            //     signUp: singup,
-            //   );
-            // } else {
-            if (!controller.isLogin) {
-              return Scaffold(body: _buildt());
+            if (snapshots.hasData) {
+              log('user has data ');
+              if (snapshots.data!.emailVerified) {
+                log('user email ver');
+                return FutureBuilder<bool>(
+                  future: controller.checkUserInFirestore(snapshots.data!.email),
+                  builder: (context, userSnapshot) {
+                    if (userSnapshot.hasData) {
+                      if (userSnapshot.data == true) {
+                        log('user complete data');
+                        return HomeScreen();
+                      } else {
+                        log('to complete data, no halaqa doc');
+                        return UserSignupDataScreen(
+                          memorizerEmail: snapshots.data!.email.toString(),
+                          password: '',
+                        );
+                      }
+                    }
+                    return Scaffold(body: Center(child: CircularProgressIndicator()));
+                  },
+                );
+              } else {
+                log(' go to email vverification');
+                return EmailVerification(
+                  memorizerEmail: snapshots.data!.email.toString(),
+                  signUp: false,
+                  // signUp: singup,
+                );
+              }
             } else {
-              return snapshots.hasData
-                  ? EmailVerification(
-                      memorizerEmail: snapshots.data!.email.toString(),
-                      signUp: controller.singup,
-                    )
-                  : Text("Error in login process");
+              log('got ot login');
+              return Scaffold(body: _newbuild());
             }
           });
     });
@@ -505,99 +522,5 @@ class LoginScreen extends StatelessWidget {
         ),
       );
     });
-  }
-
-  Widget _buildt() {
-    return Directionality(
-      textDirection: TextDirection.rtl,
-      child: Scaffold(
-        body: Stack(
-          children: [
-            // Gradient
-            Container(
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    Color(0xFFF7FAFF),
-                    Color(0xFFEAF2FF),
-                    Color(0xFFD6E6FF),
-                  ],
-                ),
-              ),
-            ),
-
-            // Blurred shapes
-            Align(
-              alignment: Alignment.topLeft,
-              child: Container(
-                width: 220,
-                height: 220,
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-
-            Align(
-              alignment: Alignment.bottomRight,
-              child: Container(
-                width: 260,
-                height: 260,
-                decoration: BoxDecoration(
-                  color: Colors.blue.withOpacity(0.18),
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-
-            BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 70, sigmaY: 70),
-              child: Container(color: Colors.transparent),
-            ),
-
-            // Content
-            Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Center(
-                  child: Image.asset("assets/icon/logo.png", width: 200),
-                ),
-                Text('توشين الردم',
-                    style: TextStyle(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87)),
-                Text('تطبيق خاص لمتابعة تدشين الردم'),
-                MyTextFieldWithLabel(
-                    label: 'اسم المستخدم',
-                    icon: Icons.person_outline_rounded,
-                    hint: '13245',
-                    filled: true,
-                    borderColor: Colors.white),
-                MyTextFieldWithLabel(
-                    label: 'كلمة المرور',
-                    icon: Icons.lock_outline_rounded,
-                    hint: '123456789',
-                    filled: true,
-                    borderColor: Colors.white),
-                Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: () {},
-                      child: Text('نسيت كلمة المرور؟'),
-                    )),
-                MyFillWidthButton(
-                  label: 'تسجيل الدخول',
-                  onPressed: () {},
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }

@@ -1,30 +1,14 @@
-import 'dart:async';
 import 'dart:developer';
-import 'dart:ffi';
-import 'dart:io';
-import 'package:excel/excel.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get_instance/get_instance.dart';
-import 'package:get/get_navigation/get_navigation.dart';
 import 'package:get/state_manager.dart';
-import 'package:intl/intl.dart' as intl;
-import 'package:path_provider/path_provider.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
 import 'package:tahfeez_app/Widgets/MenuItem.dart';
 import 'package:tahfeez_app/Widgets/MenuItems.dart';
 import 'package:tahfeez_app/Widgets/home_list_tile.dart';
-import 'package:tahfeez_app/module/auth/login/login_screen.dart';
-import 'package:tahfeez_app/module/add_record/add_record_screen.dart';
 import 'package:tahfeez_app/module/home/home_controller.dart';
-import 'package:tahfeez_app/module/student_profile/student_profile_screen.dart';
 import 'package:tahfeez_app/widgets/BottomBar.dart';
 import 'package:tahfeez_app/model/WhatsappMassage.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:tahfeez_app/model/Firestore.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});

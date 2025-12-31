@@ -5,7 +5,6 @@ import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'package:tahfeez_app/bindings.dart';
 import 'package:tahfeez_app/module/auth/login/login_screen.dart';
-import 'package:tahfeez_app/module/home/home_screen.dart';
 import 'package:tahfeez_app/services/firebase_options.dart';
 import 'package:tahfeez_app/model/SenrtyReports.dart';
 import 'package:tahfeez_app/services/shared_preferences.dart';
@@ -34,7 +33,7 @@ class MyHome extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     dynamic _nextScreen = "";
-    _nextScreen = HomeScreen();
+    _nextScreen = LoginScreen();
     return
         // BugReportOverlay();
         GetMaterialApp(

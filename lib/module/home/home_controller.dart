@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:ffi';
 import 'dart:io';
 
@@ -7,7 +8,7 @@ import 'package:file_picker/file_picker.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:get/state_manager.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:quickalert/quickalert.dart';
@@ -18,6 +19,7 @@ import 'package:tahfeez_app/model/Firestore.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:tahfeez_app/module/auth/login/login_screen.dart';
 import 'package:tahfeez_app/module/home/home_screen.dart';
+import 'package:tahfeez_app/services/shared_preferences.dart';
 
 class HomeController extends GetxController {
   Firestore myFierstor = Firestore();
@@ -978,6 +980,7 @@ class HomeController extends GetxController {
     //   // await launch(url);
     // }
     else if (item == MenuItems.itemLogout) {
+      log('logout all');
       logout();
     }
     // else if (item == MenuItems.itemContactUs) {
@@ -988,7 +991,11 @@ class HomeController extends GetxController {
   }
 
   logout() async {
-    FirebaseAuth.instance.signOut();
+    await FirebaseAuth.instance.signOut();
+    log('logout firebase auth');
+    await GoogleSignIn().signOut();
+    log('logout google account');
+    MySharedPreferences.logout();
     // await db.insertData(
     //     "UPDATE 'Login' SET username= null ,password=null,remember= false ");
     Navigator.pushAndRemoveUntil(Get.context!,
@@ -1031,7 +1038,7 @@ class HomeController extends GetxController {
           mEmail: memorizerEmail);
       result = std.map((e) => e.data()).toList();
     }
-    
+
     return result;
   }
 }

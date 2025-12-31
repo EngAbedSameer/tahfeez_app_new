@@ -5,25 +5,59 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tahfeez_app/model/Firestore.dart';
+import 'package:tahfeez_app/module/auth/email_verification/email_verification_screen.dart';
+import 'package:tahfeez_app/module/auth/signup/user_signup_data/user_signup_data_screen.dart';
 import 'package:tahfeez_app/module/home/home_screen.dart';
 import 'package:tahfeez_app/services/shared_preferences.dart';
 
 class LoginController extends GetxController {
-  late SharedPreferences prefs;
-
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
   bool _showPassword = false;
-  var isLogin = false;
+  bool isLogin = false;
   dynamic singup = false;
   bool isSignUp = false;
   // bool _showRePassword = false;
   @override
   void onInit() async {
     super.onInit();
-    prefs = await SharedPreferences.getInstance();
+  }
+
+  auth(bool isGoogle) {
+    isLogin =
+        MySharedPreferences().getBool('${PreferencesNames.check_login}') ??
+            false;
+    bool isAccountAuth = MySharedPreferences()
+            .getBool('${PreferencesNames.check_account_auth}') ??
+        false;
+    bool isAccountDataCompleted = MySharedPreferences()
+            .getBool('${PreferencesNames.check_account_data_completed}') ??
+        false;
+    bool isEmailVerified = MySharedPreferences()
+            .getBool('${PreferencesNames.check_email_verified}') ??
+        false;
+    bool isHalaqaCreated = MySharedPreferences()
+            .getBool('${PreferencesNames.check_halaqa_created}') ??
+        false;
+    String? email =
+        MySharedPreferences().getString('${PreferencesNames.email}') ?? null;
+
+    if (isLogin) {
+      Get.off(() => HomeScreen());
+    } else if (isAccountAuth) {
+      if (isHalaqaCreated) {
+        if (isAccountDataCompleted) {
+          if (isEmailVerified) {
+            Get.off(() => HomeScreen());
+          }
+        }
+      } else {
+        // Get.off(() => UserSignupDataScreen(
+        //       memorizerEmail: email,
+        //     ));
+      }
+    }
   }
 
   googleLogin() async {
@@ -36,8 +70,7 @@ class LoginController extends GetxController {
     MySharedPreferences()
         .setBool(PreferencesNames.check_halaqa_created.name, false);
     MySharedPreferences().setBool(PreferencesNames.check_login.name, false);
-    MySharedPreferences()
-        .setBool(PreferencesNames.check_onboarding_completed.name, false);
+
     try {
       GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
       if (gUser == null) return;
@@ -79,8 +112,6 @@ class LoginController extends GetxController {
     MySharedPreferences()
         .setBool(PreferencesNames.check_halaqa_created.name, false);
     MySharedPreferences().setBool(PreferencesNames.check_login.name, false);
-    MySharedPreferences()
-        .setBool(PreferencesNames.check_onboarding_completed.name, false);
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
@@ -126,8 +157,7 @@ class LoginController extends GetxController {
     MySharedPreferences()
         .setBool(PreferencesNames.check_halaqa_created.name, false);
     MySharedPreferences().setBool(PreferencesNames.check_login.name, false);
-    MySharedPreferences()
-        .setBool(PreferencesNames.check_onboarding_completed.name, false);
+
     try {
       QuickAlert.show(
         context: Get.context!,
@@ -137,7 +167,8 @@ class LoginController extends GetxController {
           .createUserWithEmailAndPassword(
               email: emailController.text, password: passwordController.text)
           .then((v) {
-        Get.back();
+        log('the user singup and go to complete data and ferydi');
+        // Get.back();
       });
 
       return true;
