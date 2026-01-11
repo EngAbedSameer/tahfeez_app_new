@@ -284,7 +284,6 @@ class AddRecordScreen extends StatelessWidget {
   _newbuild() {
     return SingleChildScrollView(
       child: GetBuilder<AddRecordController>(builder: (controller) {
-        //600$ 300
         return Padding(
           padding: const EdgeInsets.all(18),
           child: Form(

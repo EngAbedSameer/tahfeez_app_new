@@ -44,12 +44,16 @@ class StudentsController extends GetxController {
     List<Map<String, dynamic>> result;
     // result = damyData;
     try {
-      var n = await InternetAddress.lookup('google.com');
+        print("test network");
+
+      var n = await InternetAddress.lookup('https://www.google.com');
       if (!n.isEmpty || n != null) {
         print("enable network");
         myFierstor.ref.enableNetwork();
       }
     } catch (exception) {
+        print("disable network");
+
       myFierstor.ref.disableNetwork();
       ScaffoldMessenger.of(Get.context!)
           .showSnackBar(SnackBar(content: Text("لا يوجد إتصال بالانترنت")));

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/get_instance/get_instance.dart';
@@ -57,6 +59,7 @@ class _HomeScreenState extends State<HomeScreen>
                 if (snapshot.hasData &&
                     snapshot.data != null &&
                     snapshot.data!.length > 0) {
+                  log('{$snapshot.data.length}');
                   return SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
@@ -128,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen>
                             ListTile(
                               contentPadding: EdgeInsets.all(8),
                               title: Text('مجموع تسميع الأسبوع'),
-                              subtitle: Text('2 آية'),
+                              subtitle: Text('200 آية'),
                               trailing: ClipRRect(
                                 borderRadius: BorderRadiusGeometry.circular(8),
                                 child: Image.asset(
@@ -142,7 +145,7 @@ class _HomeScreenState extends State<HomeScreen>
                             ListTile(
                               contentPadding: EdgeInsets.all(8),
                               title: Text('الدورات الفعّالة'),
-                              subtitle: Text('20 دورة'),
+                              subtitle: Text('5 دورة'),
                               trailing: ClipRRect(
                                 borderRadius: BorderRadiusGeometry.circular(8),
                                 child: Image.asset(
@@ -173,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen>
                                     //         mEmail: controller.memorizerEmail);
                                     // var data = await stemp.get();
                                     // controller.exportToExcel(data.docs);
-                                     Get.to(()=>AddRecordScreen(
+                                    Get.to(() => AddRecordScreen(
                                         stdID: '1',
                                         memorizerEmail: 'memorizerEmail',
                                         stdName: 'stdName'));
