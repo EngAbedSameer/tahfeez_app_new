@@ -2,19 +2,9 @@ import 'dart:developer';
 // import 'dart:ffi';
 import 'dart:io';
 
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:excel/excel.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:quickalert/quickalert.dart';
-import 'package:sentry_flutter/sentry_flutter.dart';
-import 'package:tahfeez_app/Widgets/MenuItem.dart';
-import 'package:tahfeez_app/Widgets/MenuItems.dart';
 import 'package:tahfeez_app/model/Firestore.dart';
-import 'package:intl/intl.dart' as intl;
 
 class StudentsController extends GetxController {
   Firestore myFierstor = Firestore();
