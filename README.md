@@ -1,16 +1,9 @@
 # tahfeez_app
 
-A new Flutter project.
+# tahfeez_app
 
-## Getting Started
+is a Flutter-Based managment system to manage tradetinal Qu'ran schools
 
-This project is a starting point for a Flutter application.
+## Note: to get best experience but site in Mobile mode or make window with smalles width
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+ [Go TO Site](https://engabedsameer.github.io/tahfeez_app_new/web)
