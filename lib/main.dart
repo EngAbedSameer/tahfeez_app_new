@@ -34,8 +34,7 @@ class MyHome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    dynamic _nextScreen = "";
-    _nextScreen = LoginScreen(
+    dynamic _nextScreen = LoginScreen(
      
     );
     return
@@ -111,11 +110,13 @@ class MyHome extends StatelessWidget {
                     ),
                 home: Directionality(
                   textDirection: TextDirection.rtl,
-                  child: AnimatedSplashScreen(
-                      splashIconSize: 600,
-                      splash: Splash(),
-                      nextScreen: _nextScreen,
-                      duration: 2000),
+                  child: 
+                  _nextScreen
+                  // AnimatedSplashScreen(
+                  //     splashIconSize: 600,
+                  //     splash: Splash(),
+                  //     nextScreen: _nextScreen,
+                  //     duration: 2000),
                 ),
                 // routes: {
                 //   'home': (context) => Home(),

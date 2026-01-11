@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/state_manager.dart';
 import 'package:tahfeez_app/Widgets/my_fill_width_button.dart';
@@ -176,7 +177,7 @@ class LoginScreen extends StatelessWidget {
               }
             } else {
               log('got ot login');
-              return Scaffold(body: _newbuild());
+              return Scaffold(body: _newbuild(context));
             }
           });
     });
@@ -393,148 +394,300 @@ class LoginScreen extends StatelessWidget {
   //   // }
   // }
 
-  Widget _newbuild() {
+  Widget _newbuild(context) {
     return GetBuilder<LoginController>(builder: (controller) {
-      return SizedBox(
-        height: 800,
-        child: Stack(
-          children: [
-            Image.asset(
-              'assets/images/login.jpg',
-              width: double.infinity,
-              // height: MediaQuery.of(context).size.height>800?MediaQuery.of(context).size.height:,
-            ),
-            Positioned(
-              top: 240,
-              child: Container(
-                width: 360.w,
-                height: 565.h,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(30),
-                  color: Color(0xffffffff),
+      var width = MediaQuery.of(context).size.width;
+      return LayoutBuilder(builder: (context, constraints) {
+        if (width <= 700) {
+          return SizedBox(
+            height: 800,
+            child: Stack(
+              children: [
+                Image.asset(
+                  'assets/images/login.jpg',
+                  width: double.infinity,
+                  // height: MediaQuery.of(context).size.height>800?MediaQuery.of(context).size.height:,
                 ),
-                padding: EdgeInsets.all(20),
-                child: SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      Text(
-                        controller.isSignUp ? 'Signup' : 'Login',
-                        style: TextStyle(
-                            fontSize: 28, fontWeight: FontWeight.bold),
-                      ),
-                      MyTextFieldWithLabel(
-                        textInputAction: TextInputAction.next,
-                        controller: controller.emailController,
-                        label: 'Email',
-                        icon: Icon(Icons.email_outlined),
-                        hint: 'example@my.com',
-                        borderColor: Colors.transparent,
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                        borderRadius: 50,
-                      ),
-                      MyTextFieldWithLabel(
-                        borderRadius: 50,
-                        textInputAction: TextInputAction.done,
-                        controller: controller.passwordController,
-                        label: 'Password',
-                        icon: Icon(Icons.lock),
-                        hint: '********',
-                        borderColor: Colors.transparent,
-                        filled: true,
-                        fillColor: Colors.grey[200],
-                      ),
-                      controller.isSignUp
-                          ? MyTextFieldWithLabel(
-                              label: 'Re-Password',
-                              icon: Icon(Icons.lock),
-                              hint: '********')
-                          : SizedBox(),
-                      MyFillWidthButton(
-                        label: 'login',
-                        onPressed: () {
+                Positioned(
+                  top: 240,
+                  child: Container(
+                    width: 360.w,
+                    height: 565.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(30),
+                      color: Color(0xffffffff),
+                    ),
+                    padding: EdgeInsets.all(20),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          Text(
+                            controller.isSignUp ? 'Signup' : 'Login',
+                            style: TextStyle(
+                                fontSize: 28, fontWeight: FontWeight.bold),
+                          ),
+                          MyTextFieldWithLabel(
+                            textInputAction: TextInputAction.next,
+                            controller: controller.emailController,
+                            label: 'Email',
+                            icon: Icon(Icons.email_outlined),
+                            hint: 'example@my.com',
+                            borderColor: Colors.transparent,
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                            borderRadius: 50,
+                          ),
+                          MyTextFieldWithLabel(
+                            borderRadius: 50,
+                            textInputAction: TextInputAction.done,
+                            controller: controller.passwordController,
+                            label: 'Password',
+                            icon: Icon(Icons.lock),
+                            hint: '********',
+                            borderColor: Colors.transparent,
+                            filled: true,
+                            fillColor: Colors.grey[200],
+                          ),
                           controller.isSignUp
-                              ? controller.signUp().then((value) {
-                                  if (value) {
-                                    log('Signup successful for email: ${controller.emailController.text}');
-                                    MySharedPreferences().setBool(
-                                        PreferencesNames.check_login.toString(),
-                                        true);
-                                  } else {
-                                    log('Signup failed for email: ${controller.emailController.text}');
-                                  }
-                                })
-                              : controller.login().then((value) {
-                                  if (value) {
-                                    log('Login successful for email: ${controller.emailController.text}');
-                                    MySharedPreferences().setBool(
-                                        PreferencesNames.check_login.toString(),
-                                        true);
-                                  } else {
-                                    log('Login failed for email: ${controller.emailController.text}');
-                                  }
-                                });
-                        },
-                      ),
-                      SizedBox(
-                        height: 10,
-                      ),
-                      Text.rich(
-                          TextSpan(text: "Don't have an account? ", children: [
-                        TextSpan(
-                            text: controller.isSignUp ? 'Login' : 'Signup',
-                            style: TextStyle(color: Colors.green),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                // state.
-                                log('tapped signup/login');
-                                controller.isSignUp = true;
-                                controller.update();
-                              }),
-                      ])),
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        'OR',
-                        style: TextStyle(fontSize: 22, color: Colors.grey[400]),
-                      ),
-                      GestureDetector(
-                        onTap: () {
-                          controller.googleLogin();
-                        },
-                        child: ClipRRect(
-                          // borderRadius: BorderRadius.circular(13),
-                          child: BackdropFilter(
-                            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-                            child: Container(
-                              width: 65,
-                              height: 65,
-                              decoration: BoxDecoration(
-                                  border: Border.all(
-                                      width: 1.2,
+                              ? MyTextFieldWithLabel(
+                                  label: 'Re-Password',
+                                  icon: Icon(Icons.lock),
+                                  hint: '********')
+                              : SizedBox(),
+                          MyFillWidthButton(
+                            label: 'login',
+                            onPressed: () {
+                              controller.isSignUp
+                                  ? controller.signUp().then((value) {
+                                      if (value) {
+                                        log('Signup successful for email: ${controller.emailController.text}');
+                                        MySharedPreferences().setBool(
+                                            PreferencesNames.check_login
+                                                .toString(),
+                                            true);
+                                      } else {
+                                        log('Signup failed for email: ${controller.emailController.text}');
+                                      }
+                                    })
+                                  : controller.login().then((value) {
+                                      if (value) {
+                                        log('Login successful for email: ${controller.emailController.text}');
+                                        MySharedPreferences().setBool(
+                                            PreferencesNames.check_login
+                                                .toString(),
+                                            true);
+                                      } else {
+                                        log('Login failed for email: ${controller.emailController.text}');
+                                      }
+                                    });
+                            },
+                          ),
+                          SizedBox(
+                            height: 10,
+                          ),
+                          Text.rich(TextSpan(
+                              text: "Don't have an account? ",
+                              children: [
+                                TextSpan(
+                                    text: controller.isSignUp
+                                        ? 'Login'
+                                        : 'Signup',
+                                    style: TextStyle(color: Colors.green),
+                                    recognizer: TapGestureRecognizer()
+                                      ..onTap = () {
+                                        // state.
+                                        log('tapped signup/login');
+                                        controller.isSignUp = true;
+                                        controller.update();
+                                      }),
+                              ])),
+                          SizedBox(
+                            height: 8,
+                          ),
+                          Text(
+                            'OR',
+                            style: TextStyle(
+                                fontSize: 22, color: Colors.grey[400]),
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              controller.googleLogin();
+                            },
+                            child: ClipRRect(
+                              // borderRadius: BorderRadius.circular(13),
+                              child: BackdropFilter(
+                                filter:
+                                    ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                                child: Container(
+                                  width: 65,
+                                  height: 65,
+                                  decoration: BoxDecoration(
+                                      border: Border.all(
+                                          width: 1.2,
+                                          color: Colors.grey
+                                              .withValues(alpha: 0.1)),
+                                      borderRadius: BorderRadius.circular(15),
                                       color:
-                                          Colors.grey.withValues(alpha: 0.1)),
-                                  borderRadius: BorderRadius.circular(15),
-                                  color: Colors.grey.withValues(alpha: 0.05)),
-                              padding: EdgeInsets.all(12),
-                              margin: EdgeInsets.all(15),
-                              child: Image.asset(
-                                'assets/images/google.png',
-                                width: 32,
+                                          Colors.grey.withValues(alpha: 0.05)),
+                                  padding: EdgeInsets.all(12),
+                                  margin: EdgeInsets.all(15),
+                                  child: Image.asset(
+                                    'assets/images/google.png',
+                                    width: 32,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          );
+        } else {
+          return Stack(
+            children: [
+              SizedBox(width: width,),
+              Image.asset('assets/images/login.jpg',
+                  width: width / 1.7, height: MediaQuery.of(context).size.height,fit: BoxFit.cover,),
+            Positioned(
+              left: 10.w,
+              top: 150.h,
+              child: Container(
+                margin: EdgeInsets.only(right: 100),
+                  width: width/3.0,
+                  height: 565.h,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(30),
+                    color: Color(0xffffffff),
+                  ),
+                  padding: EdgeInsets.all(20),
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        Text(
+                          controller.isSignUp ? 'Signup' : 'Login',
+                          style: TextStyle(
+                              fontSize: 28, fontWeight: FontWeight.bold),
+                        ),
+                        MyTextFieldWithLabel(
+                          textInputAction: TextInputAction.next,
+                          controller: controller.emailController,
+                          label: 'Email',
+                          icon: Icon(Icons.email_outlined),
+                          hint: 'example@my.com',
+                          borderColor: Colors.transparent,
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                          borderRadius: 50,
+                        ),
+                        MyTextFieldWithLabel(
+                          borderRadius: 50,
+                          textInputAction: TextInputAction.done,
+                          controller: controller.passwordController,
+                          label: 'Password',
+                          icon: Icon(Icons.lock),
+                          hint: '********',
+                          borderColor: Colors.transparent,
+                          filled: true,
+                          fillColor: Colors.grey[200],
+                        ),
+                        controller.isSignUp
+                            ? MyTextFieldWithLabel(
+                                label: 'Re-Password',
+                                icon: Icon(Icons.lock),
+                                hint: '********')
+                            : SizedBox(),
+                        MyFillWidthButton(
+                          label: 'login',
+                          onPressed: () {
+                            controller.isSignUp
+                                ? controller.signUp().then((value) {
+                                    if (value) {
+                                      log('Signup successful for email: ${controller.emailController.text}');
+                                      MySharedPreferences().setBool(
+                                          PreferencesNames.check_login.toString(),
+                                          true);
+                                    } else {
+                                      log('Signup failed for email: ${controller.emailController.text}');
+                                    }
+                                  })
+                                : controller.login().then((value) {
+                                    if (value) {
+                                      log('Login successful for email: ${controller.emailController.text}');
+                                      MySharedPreferences().setBool(
+                                          PreferencesNames.check_login.toString(),
+                                          true);
+                                    } else {
+                                      log('Login failed for email: ${controller.emailController.text}');
+                                    }
+                                  });
+                          },
+                        ),
+                        SizedBox(
+                          height: 10,
+                        ),
+                        Text.rich(
+                            TextSpan(text: "Don't have an account? ", children: [
+                          TextSpan(
+                              text: controller.isSignUp ? 'Login' : 'Signup',
+                              style: TextStyle(color: Colors.green),
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  // state.
+                                  log('tapped signup/login');
+                                  controller.isSignUp = true;
+                                  controller.update();
+                                }),
+                        ])),
+                        SizedBox(
+                          height: 8,
+                        ),
+                        Text(
+                          'OR',
+                          style: TextStyle(fontSize: 22, color: Colors.grey[400]),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            controller.googleLogin();
+                          },
+                          child: ClipRRect(
+                            // borderRadius: BorderRadius.circular(13),
+                            child: BackdropFilter(
+                              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                              child: Container(
+                                width: 65,
+                                height: 65,
+                                decoration: BoxDecoration(
+                                    border: Border.all(
+                                        width: 1.2,
+                                        color:
+                                            Colors.grey.withValues(alpha: 0.1)),
+                                    borderRadius: BorderRadius.circular(15),
+                                    color: Colors.grey.withValues(alpha: 0.05)),
+                                padding: EdgeInsets.all(12),
+                                margin: EdgeInsets.all(15),
+                                child: Image.asset(
+                                  'assets/images/google.png',
+                                  width: 32,
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      )
-                    ],
+                        )
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
-        ),
-      );
+            ),
+
+            ],
+          );
+        }
+      });
     });
   }
 }
