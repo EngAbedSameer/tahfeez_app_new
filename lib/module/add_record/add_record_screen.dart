@@ -369,6 +369,7 @@ class AddRecordScreen extends StatelessWidget {
                     if (value == null || value == '') {
                       return 'هذه الخانة مطلوبة';
                     }
+                    return null;
                     // if (int.parse(controller.endAyahController.text) <=
                     //     int.parse(controller.startAyaController.text)) {
                     //   return 'يجب ان تكون آية النهاية أكبر من آية البداية';
