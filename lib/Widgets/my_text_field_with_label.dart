@@ -51,6 +51,7 @@ class MyTextFieldWithLabel extends StatelessWidget {
               if(v==null || v==''){
                 return 'هذه الخانة مطلوبة';
               }
+              return null;
             },
             controller: controller,
             keyboardType: keyboardType,
