@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:tahfeez_app/Widgets/BottomBar.dart';
 import 'package:tahfeez_app/model/Firestore.dart';
 import 'package:tahfeez_app/model/Student.dart';
 // import 'sqfDB.dart';
@@ -58,7 +57,7 @@ class _AddStudentState extends State<AddStudent>
     try {
       DateTime now = DateTime.now();
       String date = intl.DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
-      std =  Student(
+      std = Student(
           memorizerEmail: widget.memorizerEmail,
           fname: fname,
           mname: mname,
@@ -75,7 +74,7 @@ class _AddStudentState extends State<AddStudent>
           lastTest: lastTest,
           lastTestDegree: lastTestDegree,
           last_update: date,
-          isDeleted:"false");
+          isDeleted: "false");
       std.addStudent();
       // String date =
       //     '${now.year}-${now.month}-${now.day} ${now.hour}:${now.minute}:${now.second}';
@@ -114,14 +113,14 @@ class _AddStudentState extends State<AddStudent>
   //   return result;
   // }
   _dateValidator(date) {
-    bool result =true;
+    bool result = true;
     List<String> dateValid = date.toString().split("-");
-    if (dateValid.length==3) {
-      if (dateValid[0].length == 2)  result=false;
-      if (dateValid[1].length == 2)  result=false;
-      if (dateValid[2].length == 4)  result=false;
-    }else{
-       result=false;
+    if (dateValid.length == 3) {
+      if (dateValid[0].length == 2) result = false;
+      if (dateValid[1].length == 2) result = false;
+      if (dateValid[2].length == 4) result = false;
+    } else {
+      result = false;
     }
     return result;
     // print(dateValid);
@@ -158,12 +157,12 @@ class _AddStudentState extends State<AddStudent>
                       SizedBox(
                         height: 20,
                       ),
-                      Image.asset("assets/icon/logo.png",width: 100),
+                      Image.asset("assets/icon/logo.png", width: 100),
                       SizedBox(
                         height: 20,
                       ),
                       TextFormField(
-                        textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -188,7 +187,7 @@ class _AddStudentState extends State<AddStudent>
                         height: _space,
                       ),
                       TextFormField(
-                        textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -212,7 +211,7 @@ class _AddStudentState extends State<AddStudent>
                         height: _space,
                       ),
                       TextFormField(
-                        textInputAction: TextInputAction.next,
+                          textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -236,8 +235,8 @@ class _AddStudentState extends State<AddStudent>
                         height: _space,
                       ),
                       TextFormField(
-                        keyboardType: TextInputType.phone,
-                        textInputAction: TextInputAction.next,
+                          keyboardType: TextInputType.phone,
+                          textInputAction: TextInputAction.next,
                           validator: (value) {
                             if (value == null || value.length == 0)
                               return "يجب ملئ هذا الحقل ";
@@ -269,8 +268,8 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (_dateValidator(value)) {
                                     return "يجب ملئ هذا الحقل او تعديل صيغة التاريخ";
@@ -301,8 +300,8 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   // print(value!.length);
                                   if (value == null || value.length == 0)
@@ -340,7 +339,7 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
-                              textInputAction: TextInputAction.next,
+                                textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -370,8 +369,8 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -406,8 +405,8 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
-                              keyboardType: TextInputType.number,
-                              textInputAction: TextInputAction.next,
+                                keyboardType: TextInputType.number,
+                                textInputAction: TextInputAction.next,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -437,7 +436,7 @@ class _AddStudentState extends State<AddStudent>
                           SizedBox(
                             width: vw * 0.4,
                             child: TextFormField(
-                              keyboardType: TextInputType.number,
+                                keyboardType: TextInputType.number,
                                 validator: (value) {
                                   if (value == null || value.length == 0)
                                     return "يجب ملئ هذا الحقل ";
@@ -506,13 +505,13 @@ class _AddStudentState extends State<AddStudent>
           ),
         ),
       ]),
-      bottomNavigationBar: BottomBar(
-        dailyReplace: true,
-        dailyPush: true,
-        home: true,
-        addStudent: false,
-        memorizerEmail: widget.memorizerEmail,
-      ),
+      // bottomNavigationBar: BottomBar(
+      //   dailyReplace: true,
+      //   dailyPush: true,
+      //   home: true,
+      //   addStudent: false,
+      //   memorizerEmail: widget.memorizerEmail,
+      // ),
     );
   }
 }

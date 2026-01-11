@@ -3,66 +3,64 @@ import 'package:flutter/material.dart';
 import 'package:get/get_instance/get_instance.dart';
 import 'package:get/state_manager.dart';
 import 'package:quickalert/quickalert.dart';
-import 'package:tahfeez_app/Widgets/MenuItem.dart';
-import 'package:tahfeez_app/Widgets/MenuItems.dart';
-import 'package:tahfeez_app/Widgets/home_list_tile.dart';
-import 'package:tahfeez_app/module/home/home_controller.dart';
-import 'package:tahfeez_app/widgets/BottomBar.dart';
+import 'package:svg_flutter/svg.dart';
+import 'package:tahfeez_app/Widgets/students_list_tile.dart';
 import 'package:tahfeez_app/model/WhatsappMassage.dart';
+import 'package:tahfeez_app/module/students/students_controller.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class StudentsScreen extends StatefulWidget {
+  const StudentsScreen({super.key});
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  State<StudentsScreen> createState() => _StudentsScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen>
+class _StudentsScreenState extends State<StudentsScreen>
     with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
-    return GetBuilder<HomeController>(
+    return GetBuilder<StudentsController>(
       initState: (state) {
-        Get.lazyPut(() => HomeController());
+        Get.lazyPut(() => StudentsController());
         state.controller?.memorizerEmail = 'eng@test.com';
       },
       builder: (controller) {
         controller.memorizerEmail = 'eng@test.com';
         // FirebaseAuth.instance.currentUser?.email.toString();
         return Scaffold(
-            appBar: AppBar(
-              actions: [
-                PopupMenuButton<MyMenuItem>(
-                    onSelected: (item) => controller.onSelected(context, item),
-                    itemBuilder: (context) => [
-                          ...MenuItems.items.map(controller.buildItem).toList()
-                        ]),
-              ],
-              title: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text("الرئيسية"),
-                  IconButton(
-                    icon: Icon(Icons.message_outlined),
-                    onPressed: () {
-                      QuickAlert.show(
-                          context: context,
-                          type: QuickAlertType.loading,
-                          title: "جاري تجهيز الرسالة");
-                      WhatsappMassage()
-                          .getRecordsToMessage(controller.memorizerEmail)
-                          .then((value) => Navigator.pop(context));
-                    },
-                  )
-                ],
+          appBar: AppBar(
+            centerTitle: true,
+            actions: [
+              IconButton(
+                icon: SvgPicture.asset(
+                  'assets/images/whatsapp_icon.svg',
+                  width: 24,
+                  height: 24,
+                ),
+                onPressed: () {
+                  QuickAlert.show(
+                      context: context,
+                      type: QuickAlertType.loading,
+                      title: "جاري تجهيز الرسالة");
+                  WhatsappMassage()
+                      .getRecordsToMessage(controller.memorizerEmail)
+                      .then((value) => Navigator.pop(context));
+                },
               ),
-            ),
-            body: _newBuild(),
-            bottomNavigationBar: BottomBar(
-              dailyReplace: false,
-              dailyPush: true,
-              home: false,
-              addStudent: true,
-              memorizerEmail: '${controller.memorizerEmail}',
-            ));
+              // PopupMenuButton<MyMenuItem>(
+              //     onSelected: (item) => controller.onSelected(context, item),
+              //     itemBuilder: (context) =>
+              //         [...MenuItems.items.map(controller.buildItem).toList()]),
+            ],
+            title: Text("الطلاب"),
+          ),
+          body: _newBuild(),
+          // bottomNavigationBar: BottomBar(
+          //   dailyReplace: false,
+          //   dailyPush: true,
+          //   home: false,
+          //   addStudent: true,
+          //   memorizerEmail: '${controller.memorizerEmail}',
+          // )
+        );
       },
     );
   }
@@ -73,7 +71,7 @@ class _HomeScreenState extends State<HomeScreen>
   //       await Navigator.pushReplacement(
   //           context,
   //           PageRouteBuilder(
-  //               pageBuilder: (a, b, c) => HomeScreen(),
+  //               pageBuilder: (a, b, c) => StudentsScreen(),
   //               transitionDuration: Duration(seconds: 0)));
   //     },
   //     child: FutureBuilder(
@@ -194,7 +192,7 @@ class _HomeScreenState extends State<HomeScreen>
   _newBuild() {
     log('message from get builder');
 
-    return GetBuilder<HomeController>(
+    return GetBuilder<StudentsController>(
       builder: (controller) {
         return RefreshIndicator(
           onRefresh: () async {
@@ -202,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen>
           },
           child: FutureBuilder(
               future: controller.getStudentsFDate(),
+              // getStudentsFDate(),
               builder: ((context, AsyncSnapshot snapshot) {
                 // log('test if any student ${snapshot.hasData} && ${snapshot.data!.length > 0}');
                 if (snapshot.hasData &&
@@ -218,7 +217,7 @@ class _HomeScreenState extends State<HomeScreen>
                         Map stdData = data.elementAt(index);
                         // getFirestoreDataAsListWithID(
                         //     stdData, snapshot.data!.elementAt(index).id);
-                        return HomeListTile(
+                        return StudentsListTile(
                             // context: Get.context,
                             memorizerEmail: controller.memorizerEmail,
                             stdData: stdData);

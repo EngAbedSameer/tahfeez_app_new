@@ -3,6 +3,7 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/state_manager.dart';
 import 'package:tahfeez_app/Widgets/my_fill_width_button.dart';
 import 'package:tahfeez_app/Widgets/my_text_field_with_label.dart';
@@ -11,7 +12,7 @@ import 'package:tahfeez_app/module/auth/login/login_controller.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:tahfeez_app/module/auth/signup/user_signup_data/user_signup_data_screen.dart';
-import 'package:tahfeez_app/module/home/home_screen.dart';
+import 'package:tahfeez_app/module/main/main_screen.dart';
 import 'package:tahfeez_app/services/shared_preferences.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -146,12 +147,13 @@ class LoginScreen extends StatelessWidget {
               if (snapshots.data!.emailVerified) {
                 log('user email ver');
                 return FutureBuilder<bool>(
-                  future: controller.checkUserInFirestore(snapshots.data!.email),
+                  future:
+                      controller.checkUserInFirestore(snapshots.data!.email),
                   builder: (context, userSnapshot) {
                     if (userSnapshot.hasData) {
                       if (userSnapshot.data == true) {
                         log('user complete data');
-                        return HomeScreen();
+                        return MainScreen();
                       } else {
                         log('to complete data, no halaqa doc');
                         return UserSignupDataScreen(
@@ -160,7 +162,8 @@ class LoginScreen extends StatelessWidget {
                         );
                       }
                     }
-                    return Scaffold(body: Center(child: CircularProgressIndicator()));
+                    return Scaffold(
+                        body: Center(child: CircularProgressIndicator()));
                   },
                 );
               } else {
@@ -399,12 +402,13 @@ class LoginScreen extends StatelessWidget {
             Image.asset(
               'assets/images/login.jpg',
               width: double.infinity,
+              // height: MediaQuery.of(context).size.height>800?MediaQuery.of(context).size.height:,
             ),
             Positioned(
               top: 240,
               child: Container(
-                width: 360,
-                height: 565,
+                width: 360.w,
+                height: 565.h,
                 decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(30),
                   color: Color(0xffffffff),
@@ -419,21 +423,31 @@ class LoginScreen extends StatelessWidget {
                             fontSize: 28, fontWeight: FontWeight.bold),
                       ),
                       MyTextFieldWithLabel(
-                          textInputAction: TextInputAction.next,
-                          controller: controller.emailController,
-                          label: 'Email',
-                          icon: Icons.email_outlined,
-                          hint: 'example@my.com'),
+                        textInputAction: TextInputAction.next,
+                        controller: controller.emailController,
+                        label: 'Email',
+                        icon: Icon(Icons.email_outlined),
+                        hint: 'example@my.com',
+                        borderColor: Colors.transparent,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                        borderRadius: 50,
+                      ),
                       MyTextFieldWithLabel(
-                          textInputAction: TextInputAction.done,
-                          controller: controller.passwordController,
-                          label: 'Password',
-                          icon: Icons.lock,
-                          hint: '********'),
+                        borderRadius: 50,
+                        textInputAction: TextInputAction.done,
+                        controller: controller.passwordController,
+                        label: 'Password',
+                        icon: Icon(Icons.lock),
+                        hint: '********',
+                        borderColor: Colors.transparent,
+                        filled: true,
+                        fillColor: Colors.grey[200],
+                      ),
                       controller.isSignUp
                           ? MyTextFieldWithLabel(
                               label: 'Re-Password',
-                              icon: Icons.lock,
+                              icon: Icon(Icons.lock),
                               hint: '********')
                           : SizedBox(),
                       MyFillWidthButton(

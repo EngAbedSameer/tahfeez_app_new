@@ -1,5 +1,4 @@
 import 'dart:developer';
-import 'dart:ffi';
 import 'dart:io';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,7 +17,7 @@ import 'package:tahfeez_app/Widgets/MenuItems.dart';
 import 'package:tahfeez_app/model/Firestore.dart';
 import 'package:intl/intl.dart' as intl;
 import 'package:tahfeez_app/module/auth/login/login_screen.dart';
-import 'package:tahfeez_app/module/home/home_screen.dart';
+import 'package:tahfeez_app/module/main/home/home_screen.dart';
 import 'package:tahfeez_app/services/shared_preferences.dart';
 
 class HomeController extends GetxController {
@@ -26,31 +25,45 @@ class HomeController extends GetxController {
   Duration? executionTime;
   var memorizerEmail;
 
-  // List<Map<String, dynamic>> damyData = [
-  //   {
-  //     'surah': 'qaaf',
-  //     'points': '15',
-  //     'l_name': 'sameer',
-  //     'f_name': 'abed',
-  //     'IDn': '405961517',
-  //   },
-  //   {
-  //     'surah': 'qaaf2',
-  //     'points': '152',
-  //     'l_name': 'sameer2',
-  //     'f_name': 'abed2',
-  //     'IDn': '4059615172',
-  //   },
-  //   {
-  //     'surah': 'qaaf3',
-  //     'points': '153',
-  //     'l_name': 'sameer3',
-  //     'f_name': 'abed3',
-  //     'IDn': '4059615173',
-  //   },
+  List<Map<String, dynamic>> damyData = [
+    {
+      'surah': 'Qaaf',
+      'points': '15',
+      'l_name': 'sameer',
+      'f_name': 'abed',
+      'IDn': '405961517',
+      'start':'1',
+      'end':'20'
+    },
+    {
+      'surah': 'qaaf2',
+      'points': '152',
+      'l_name': 'sameer2',
+      'f_name': 'abed2',
+      'IDn': '4059615172',
+      'start': '1',
+      'end': '20'
+    },
+    {
+      'surah': 'qaaf3',
+      'points': '153',
+      'l_name': 'sameer3',
+      'f_name': 'abed3',
+      'IDn': '4059615173',
+      'start': '1',
+      'end': '20'
+    },
 
-  // ];
+  ];
 
+Future damyData1(){
+  return Future.delayed(
+    Duration(seconds: 0), 
+    (){
+      return damyData;
+    }
+  );
+}
   max(a, b) {
     if (double.parse(a['points']) >= double.parse(b['points']))
       return a;
@@ -910,10 +923,8 @@ class HomeController extends GetxController {
     //   //       type: QuickAlertType.error,
     //   //       title: "عذراً، حدثت مشكلة غير متوقعة");
     //   // }
-
     //   // } catch (e) {
     //   //   print('======================= Excaption1 ========================');
-
     //   //   Navigator.pop(context);
     //   //   QuickAlert.show(
     //   //       context: Get.context,
@@ -950,13 +961,14 @@ class HomeController extends GetxController {
 
       // _importDateToLocalDB(await data);
       // _get1(data);
-    } else if (item == MenuItems.itemExport) {
-      var stemp =
-          await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
-      var std = await stemp.get();
-      print(std.docs.first.data());
-      exportToExcel(std.docs);
-    }
+    } 
+    // else if (item == MenuItems.itemExport) {
+    //   var stemp =
+    //       await myFierstor.getStudentsCollection(mEmail: memorizerEmail);
+    //   var std = await stemp.get();
+    //   print(std.docs.first.data());
+    //   exportToExcel(std.docs);
+    // }
     // else if (item == MenuItems.itemDeletAll)
     //   db.deleteDatabaseFromDvice();
     // else if (item == MenuItems.itemDeletData) {
@@ -1004,8 +1016,8 @@ class HomeController extends GetxController {
     }), (route) => false);
   }
 
-  Future<Void> _refresh() async {
-    return await Navigator.pushReplacement(
+ _refresh()  {
+    return  Navigator.pushReplacement(
         Get.context!,
         PageRouteBuilder(
             pageBuilder: (a, b, c) => HomeScreen(),

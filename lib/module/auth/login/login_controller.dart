@@ -6,9 +6,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:get/get.dart';
 import 'package:quickalert/quickalert.dart';
 import 'package:tahfeez_app/model/Firestore.dart';
-import 'package:tahfeez_app/module/auth/email_verification/email_verification_screen.dart';
-import 'package:tahfeez_app/module/auth/signup/user_signup_data/user_signup_data_screen.dart';
-import 'package:tahfeez_app/module/home/home_screen.dart';
+import 'package:tahfeez_app/module/main/home/home_screen.dart';
 import 'package:tahfeez_app/services/shared_preferences.dart';
 
 class LoginController extends GetxController {
@@ -72,7 +70,10 @@ class LoginController extends GetxController {
     MySharedPreferences().setBool(PreferencesNames.check_login.name, false);
 
     try {
-      GoogleSignInAccount? gUser = await GoogleSignIn().signIn();
+      GoogleSignInAccount? gUser = await GoogleSignIn(
+              clientId:
+                  '184714010111-2a4qjrf76j5r9mgaiu8s39uuj84girsv.apps.googleusercontent.com')
+          .signIn();
       if (gUser == null) return;
       log('gUser is not null');
       GoogleSignInAuthentication gAuth = await gUser.authentication;
@@ -113,6 +114,7 @@ class LoginController extends GetxController {
         .setBool(PreferencesNames.check_halaqa_created.name, false);
     MySharedPreferences().setBool(PreferencesNames.check_login.name, false);
     try {
+      log('try to log in using ${emailController.text} ${passwordController.text}');
       await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: emailController.text, password: passwordController.text);
       return true;

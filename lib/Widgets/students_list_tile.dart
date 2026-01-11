@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:tahfeez_app/module/add_record/add_record_screen.dart';
 import 'package:tahfeez_app/module/student_profile/student_profile_screen.dart';
 
-class HomeListTile extends StatelessWidget {
+class StudentsListTile extends StatelessWidget {
   Map stdData;
   String memorizerEmail;
   // BuildContext context;
-  HomeListTile(
+  StudentsListTile(
       {required this.stdData,
       // required this.context,
       required this.memorizerEmail});
@@ -28,15 +28,18 @@ class HomeListTile extends StatelessWidget {
           children: [
             Row(children: [
               Container(
-                width: 45,
-                padding: EdgeInsets.all(0),
-                margin: EdgeInsets.all(0),
+                width: 70,
+                height: 70,
+                padding: EdgeInsets.all(3),
+                decoration: BoxDecoration(
+                    color: Colors.teal,
+                    borderRadius: BorderRadius.circular(100)),
                 // child: GestureDetector(
-                child: CircleAvatar(
-                  radius: 20,
+                child: ClipRRect(
+                  borderRadius: BorderRadiusGeometry.circular(100),
                   child: Image.asset(
-                    height: 25,
-                    "assets/icon/person.png",
+                    fit: BoxFit.cover,
+                    "assets/images/person.jpg",
                   ),
                 ),
                 // onTap: () {
@@ -62,27 +65,32 @@ class HomeListTile extends StatelessWidget {
                     //         stdData['attendance'])
                     //     .toString())
                     Text(
-                      (stdData['points']).toString(),
-                      style: TextStyle(fontSize: 12, color: Colors.tealAccent),
+                      '${stdData['surah']},${stdData['start']}-${stdData['end']} ',
+                      style: TextStyle(fontSize: 12, color: Colors.teal),
                     ),
-                    Text(
-                      (stdData['surah']).toString(),
-                      style: TextStyle(fontSize: 12, color: Colors.tealAccent),
-                    )
+                    // Text(
+                    //   (stdData['points']).toString(),
+                    //   style: TextStyle(fontSize: 12, color: Colors.teal),
+                    // ),
                   ],
                 ),
               )
             ]),
             ElevatedButton(
+              style: ButtonStyle(
+                padding: WidgetStatePropertyAll(
+                    EdgeInsets.symmetric(vertical: 5, horizontal: 8)),
+                minimumSize: WidgetStatePropertyAll(Size.zero),
+              ),
               child: Text(
-                'Add Record',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w200),
+                'أضف حفظ',
+                style: TextStyle(fontSize: 12, fontWeight: FontWeight.w400),
               ),
               onPressed: () async {
                 Navigator.push(
                     context,
                     await MaterialPageRoute(
-                        builder: (context) => NewRecord(
+                        builder: (context) => AddRecordScreen(
                               stdID: stdData['IDn'],
                               memorizerEmail: memorizerEmail,
                               stdName:
