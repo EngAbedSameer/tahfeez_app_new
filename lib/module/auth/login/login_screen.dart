@@ -550,15 +550,21 @@ class LoginScreen extends StatelessWidget {
         } else {
           return Stack(
             children: [
-              SizedBox(width: width,),
-              Image.asset('assets/images/login.jpg',
-                  width: width / 1.7, height: MediaQuery.of(context).size.height,fit: BoxFit.cover,),
-            Positioned(
-              left: 10.w,
-              top: 150.h,
-              child: Container(
-                margin: EdgeInsets.only(right: 100),
-                  width: width/3.0,
+              SizedBox(
+                width: width,
+              ),
+              Image.asset(
+                'assets/images/login.jpg',
+                width: width / 1.7,
+                height: MediaQuery.of(context).size.height,
+                fit: BoxFit.cover,
+              ),
+              Positioned(
+                left: 10.w,
+                top: 150.h,
+                child: Container(
+                  margin: EdgeInsets.only(right: 100),
+                  width: width / 3.0,
                   height: 565.h,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(30),
@@ -609,7 +615,8 @@ class LoginScreen extends StatelessWidget {
                                     if (value) {
                                       log('Signup successful for email: ${controller.emailController.text}');
                                       MySharedPreferences().setBool(
-                                          PreferencesNames.check_login.toString(),
+                                          PreferencesNames.check_login
+                                              .toString(),
                                           true);
                                     } else {
                                       log('Signup failed for email: ${controller.emailController.text}');
@@ -619,7 +626,8 @@ class LoginScreen extends StatelessWidget {
                                     if (value) {
                                       log('Login successful for email: ${controller.emailController.text}');
                                       MySharedPreferences().setBool(
-                                          PreferencesNames.check_login.toString(),
+                                          PreferencesNames.check_login
+                                              .toString(),
                                           true);
                                     } else {
                                       log('Login failed for email: ${controller.emailController.text}');
@@ -630,25 +638,28 @@ class LoginScreen extends StatelessWidget {
                         SizedBox(
                           height: 10,
                         ),
-                        Text.rich(
-                            TextSpan(text: "Don't have an account? ", children: [
-                          TextSpan(
-                              text: controller.isSignUp ? 'Login' : 'Signup',
-                              style: TextStyle(color: Colors.green),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  // state.
-                                  log('tapped signup/login');
-                                  controller.isSignUp = true;
-                                  controller.update();
-                                }),
-                        ])),
+                        Text.rich(TextSpan(
+                            text: "Don't have an account? ",
+                            children: [
+                              TextSpan(
+                                  text:
+                                      controller.isSignUp ? 'Login' : 'Signup',
+                                  style: TextStyle(color: Colors.green),
+                                  recognizer: TapGestureRecognizer()
+                                    ..onTap = () {
+                                      // state.
+                                      log('tapped signup/login');
+                                      controller.isSignUp = true;
+                                      controller.update();
+                                    }),
+                            ])),
                         SizedBox(
                           height: 8,
                         ),
                         Text(
                           'OR',
-                          style: TextStyle(fontSize: 22, color: Colors.grey[400]),
+                          style:
+                              TextStyle(fontSize: 22, color: Colors.grey[400]),
                         ),
                         GestureDetector(
                           onTap: () {
@@ -682,8 +693,7 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                 ),
-            ),
-
+              ),
             ],
           );
         }
