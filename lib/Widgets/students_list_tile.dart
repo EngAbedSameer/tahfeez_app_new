@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:tahfeez_app/module/add_record/add_record_screen.dart';
 import 'package:tahfeez_app/module/student_profile/student_profile_screen.dart';
 
@@ -14,11 +15,18 @@ class StudentsListTile extends StatelessWidget {
   Widget build(context) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => StudentProfile(
-                  studentIDn: stdData['IDn'],
-                  memorizerEmail: memorizerEmail,
-                )));
+        Get.to(
+            () => StudentProfile(
+                studentIDn: stdData['IDn'], memorizerEmail: memorizerEmail),
+            arguments: {
+              'studentIDn': stdData['IDn'],
+              'memorizerEmail': memorizerEmail
+            });
+        // Navigator.of(context).push(MaterialPageRoute(
+        //     builder: (context) => StudentProfile(
+        //           studentIDn: stdData['IDn'],
+        //           memorizerEmail: memorizerEmail,
+        //         )));
       },
       child: Container(
         margin: EdgeInsets.all(6),
@@ -37,23 +45,20 @@ class StudentsListTile extends StatelessWidget {
                 // child: GestureDetector(
                 child: ClipRRect(
                   borderRadius: BorderRadiusGeometry.circular(100),
-                  child: Image.asset(
-                    fit: BoxFit.cover,
-                    "assets/images/person.jpg",
-                  ),
+                  child: stdData['image'] == null
+                      ? Image.asset(
+                          "assets/images/user.png",
+                          // fit: BoxFit.cover,
+                          cacheHeight: 45,
+                          cacheWidth: 45,
+                          width: 45,
+                          height: 45,
+                        )
+                      : Image.network(
+                          fit: BoxFit.cover,
+                          stdData['image'],
+                        ),
                 ),
-                // onTap: () {
-                //   Navigator.of(context).push(
-                //       MaterialPageRoute(
-                //           builder: (context) =>
-                //               StudentProfile(
-                //                 studentIDn:
-                //                     stdData['IDn'],
-                //                 memorizerEmail:
-                //                     memorizerEmail,
-                //               )));
-                // },
-                // ),
               ),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -65,7 +70,7 @@ class StudentsListTile extends StatelessWidget {
                     //         stdData['attendance'])
                     //     .toString())
                     Text(
-                      '${stdData['surah']},${stdData['start']}-${stdData['end']} ',
+                      ' النقاط: ${stdData['points']} ',
                       style: TextStyle(fontSize: 12, color: Colors.teal),
                     ),
                     // Text(

@@ -1,4 +1,3 @@
-import 'dart:developer';
 // import 'dart:ffi';
 import 'dart:io';
 
@@ -44,16 +43,12 @@ class StudentsController extends GetxController {
     List<Map<String, dynamic>> result;
     // result = damyData;
     try {
-        print("test network");
 
-      var n = await InternetAddress.lookup('https://www.google.com');
+      var n = await InternetAddress.lookup('google.com');
       if (!n.isEmpty || n != null) {
-        print("enable network");
         myFierstor.ref.enableNetwork();
       }
     } catch (exception) {
-        print("disable network");
-
       myFierstor.ref.disableNetwork();
       ScaffoldMessenger.of(Get.context!)
           .showSnackBar(SnackBar(content: Text("لا يوجد إتصال بالانترنت")));
@@ -67,7 +62,6 @@ class StudentsController extends GetxController {
     } finally {
       var std = await myFierstor.getNotDeletedStudentsCollection(
           mEmail: memorizerEmail);
-          log('std count  ${std.length}');
       result = std.map((e) => e.data()).toList();
     }
 

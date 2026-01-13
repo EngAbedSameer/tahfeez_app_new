@@ -79,7 +79,7 @@ class Firestore {
   Future<Map<String, dynamic>> getStudentData(
       {required String? mEmail, required String? idn}) async {
     DocumentReference studentDoc =
-        await getStudentDoc(mEmail: mEmail!, idn: idn!);
+        await getStudentDoc(mEmail: mEmail, idn: idn);
     DocumentSnapshot temp = await studentDoc.get();
     return temp.data() as Map<String, dynamic>;
   }
@@ -147,7 +147,6 @@ class Firestore {
     var redords = await getRecordsCollection(mEmail: mEmail, idn: idn);
     var r = await redords.get();
     // var temp = await redords.where("IDn", isEqualTo: idn!).get();
-    log(" 000000000000000000  ${r.docs.first.data()}   $idn");
     // var recordDoc = redords.doc(temp.docs.first.id);
     return r.docs;
   }

@@ -3,7 +3,6 @@ import 'dart:ui';
 
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/rendering.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get/state_manager.dart';
 import 'package:tahfeez_app/Widgets/my_fill_width_button.dart';
@@ -144,19 +143,15 @@ class LoginScreen extends StatelessWidget {
           stream: FirebaseAuth.instance.authStateChanges(),
           builder: (context, snapshots) {
             if (snapshots.hasData) {
-              log('user has data ');
               if (snapshots.data!.emailVerified) {
-                log('user email ver');
                 return FutureBuilder<bool>(
                   future:
                       controller.checkUserInFirestore(snapshots.data!.email),
                   builder: (context, userSnapshot) {
                     if (userSnapshot.hasData) {
                       if (userSnapshot.data == true) {
-                        log('user complete data');
                         return MainScreen();
                       } else {
-                        log('to complete data, no halaqa doc');
                         return UserSignupDataScreen(
                           memorizerEmail: snapshots.data!.email.toString(),
                           password: '',
@@ -168,7 +163,6 @@ class LoginScreen extends StatelessWidget {
                   },
                 );
               } else {
-                log(' go to email vverification');
                 return EmailVerification(
                   memorizerEmail: snapshots.data!.email.toString(),
                   signUp: false,
@@ -176,7 +170,6 @@ class LoginScreen extends StatelessWidget {
                 );
               }
             } else {
-              log('got ot login');
               return Scaffold(body: _newbuild(context));
             }
           });

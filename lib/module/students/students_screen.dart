@@ -20,10 +20,10 @@ class _StudentsScreenState extends State<StudentsScreen>
     return GetBuilder<StudentsController>(
       initState: (state) {
         Get.lazyPut(() => StudentsController());
-        state.controller?.memorizerEmail = 'eng@test.com';
+        state.controller?.memorizerEmail = 'eng.abed.s.sh@gmail.com';
       },
       builder: (controller) {
-        controller.memorizerEmail = 'eng@test.com';
+        controller.memorizerEmail = 'eng.abed.s.sh@gmail.com';
         // FirebaseAuth.instance.currentUser?.email.toString();
         return Scaffold(
           appBar: AppBar(
@@ -198,11 +198,12 @@ class _StudentsScreenState extends State<StudentsScreen>
           onRefresh: () async {
             controller.update();
           },
-          child: FutureBuilder(
+          child:
+           FutureBuilder(
               future: controller.getStudentsFDate(),
               // getStudentsFDate(),
               builder: ((context, AsyncSnapshot snapshot) {
-                // log('test if any student ${snapshot.hasData} && ${snapshot.data!.length > 0}');
+                // log('test if any student ${snapshot.hasData} && ${snapshot.data}');
                 if (snapshot.hasData &&
                     snapshot.data != null &&
                     snapshot.data!.length > 0) {
@@ -222,7 +223,8 @@ class _StudentsScreenState extends State<StudentsScreen>
                             memorizerEmail: controller.memorizerEmail,
                             stdData: stdData);
                       });
-                } else if (!snapshot.hasData) {
+                }
+                 else if (!snapshot.hasData) {
                   // try {
                   // ScaffoldMessenger.of(context).showSnackBar(
                   //     SnackBar(content: Text("لا يوجد بيانات لعرضها ")));
@@ -230,7 +232,8 @@ class _StudentsScreenState extends State<StudentsScreen>
                   // } catch (e) {
                   //   print(e);
                   // }
-                } else {
+                }
+                 else {
                   return Center(child: CircularProgressIndicator());
                 }
               })),

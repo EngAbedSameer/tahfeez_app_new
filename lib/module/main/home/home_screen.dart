@@ -1,4 +1,3 @@
-import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -59,7 +58,6 @@ class _HomeScreenState extends State<HomeScreen>
                 if (snapshot.hasData &&
                     snapshot.data != null &&
                     snapshot.data!.length > 0) {
-                  log('{$snapshot.data.length}');
                   return SingleChildScrollView(
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 15),
