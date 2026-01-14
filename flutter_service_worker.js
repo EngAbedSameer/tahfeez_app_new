@@ -66,17 +66,10 @@ const RESOURCES = {"assets/AssetManifest.bin": "b492cf288337649b083870cc3224c5f5
 "index.html": "0f98e4f7659e1bc54f5a39940c4a7c03",
 "/": "0f98e4f7659e1bc54f5a39940c4a7c03",
 "main.dart.js": "130aa950f3ade081165b6418aa259ac5",
-<<<<<<< Updated upstream
-"manifest.json": "1209882d831dc773fd9f63192b12d8fa",
-"version.json": "2ed532340a77b73f267192c26eb2f37b"};
-// The application shell files that are downloaded before a service worker can
-// start.
-=======
 "manifest.json": "4e34cb4b9001d335cf609b9216a7fdc7",
 "version.json": "2ed532340a77b73f267192c26eb2f37b"};
 // The application shell files that are downloaded before a service worker can
 // start.
->>>>>>> Stashed changes
 const CORE = ["main.dart.js",
 "index.html",
 "flutter_bootstrap.js",
