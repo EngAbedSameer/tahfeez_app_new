@@ -30,9 +30,10 @@ const RESOURCES = {"assets/AssetManifest.bin": "b492cf288337649b083870cc3224c5f5
 "assets/fonts/AvenirArabic-Book.otf": "73ad40a90f33e30112c3aecb407b0be3",
 "assets/fonts/AvenirArabic-Heavy.otf": "02df3df898e8df9ef28a6bbfa4260a95",
 "assets/fonts/AvenirArabic-Light.otf": "e11c3ccdfe0aab09de6e9637f2592603",
+"assets/fonts/AvenirArabic-Light1.otf": "58b83eeca8864c02b6b5c3ee62b0f518",
 "assets/fonts/AvenirArabic-Medium.otf": "64adbfae6fb71353b934604552df3a26",
 "assets/fonts/MaterialIcons-Regular.otf": "1d2bf61712dd6f0c1e15cacc4e5beaa8",
-"assets/NOTICES": "031e29bc4eb7e779b49067aeef862cf6",
+"assets/NOTICES": "444cacc764e8330cd58cce9866696666",
 "assets/packages/cupertino_icons/assets/CupertinoIcons.ttf": "33b7d9392238c04c131b6ce224e13711",
 "assets/packages/quickalert/assets/confirm.gif": "bdc3e511c73e97fbc5cfb0c2b5f78e00",
 "assets/packages/quickalert/assets/error.gif": "c307db003cf53e131f1c704bb16fb9bf",
@@ -57,18 +58,25 @@ const RESOURCES = {"assets/AssetManifest.bin": "b492cf288337649b083870cc3224c5f5
 "favicon.png": "5dcef449791fa27946b3d35ad8803796",
 "flutter.js": "24bc71911b75b5f8135c949e27a2984e",
 "flutter_bootstrap.js": "fd1f9f3c9789f88fd47aa906eaf7d79f",
-"html.404": "c5de9f8603f1ddd4adc34ad873bb21c6",
+"html.404": "f0ec2975254ed03d54aab2d1839866a2",
 "icons/Icon-192.png": "ac9a721a12bbc803b44f645561ecb1e1",
 "icons/Icon-512.png": "96e752610906ba2a93c65f8abe1645f1",
 "icons/Icon-maskable-192.png": "c457ef57daa1d16f64b27b786ec2ea3c",
 "icons/Icon-maskable-512.png": "301a7604d45b3e739efc881eb04896ea",
-"index.html": "607f292df784fc7cfbb97d3b6efa18ce",
-"/": "607f292df784fc7cfbb97d3b6efa18ce",
+"index.html": "0f98e4f7659e1bc54f5a39940c4a7c03",
+"/": "0f98e4f7659e1bc54f5a39940c4a7c03",
 "main.dart.js": "130aa950f3ade081165b6418aa259ac5",
+<<<<<<< Updated upstream
 "manifest.json": "1209882d831dc773fd9f63192b12d8fa",
 "version.json": "2ed532340a77b73f267192c26eb2f37b"};
 // The application shell files that are downloaded before a service worker can
 // start.
+=======
+"manifest.json": "4e34cb4b9001d335cf609b9216a7fdc7",
+"version.json": "2ed532340a77b73f267192c26eb2f37b"};
+// The application shell files that are downloaded before a service worker can
+// start.
+>>>>>>> Stashed changes
 const CORE = ["main.dart.js",
 "index.html",
 "flutter_bootstrap.js",
